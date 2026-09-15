@@ -17,4 +17,9 @@ public interface Resources {
 
     }
 
+    interface Particles {
+        String NODE = "particles/node.p";
+        String EDGE = "particles/edge.p";
+    }
+
 }

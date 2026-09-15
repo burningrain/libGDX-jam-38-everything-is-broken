@@ -1,5 +1,6 @@
 package com.github.br.libgdx.jam38.game.model.vertex;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.model.GameVertexState;
 import com.github.br.libgdx.jam38.game.model.VertexDelta;
@@ -37,5 +38,7 @@ public interface GameVertex {
     void addEnergy(float addedEnergy);
 
     void changeEnergy(float diff);
+
+    Vector2 getPosition();
 
 }

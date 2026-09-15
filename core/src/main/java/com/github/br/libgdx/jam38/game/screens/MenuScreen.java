@@ -9,7 +9,6 @@ import com.github.br.libgdx.jam38.structure.ui.TiledMapUiScreen;
 
 public class MenuScreen extends TiledMapUiScreen {
 
-
     public MenuScreen(String tiledMapPath, String pathToSkin, boolean isGlProfileActive) {
         super(tiledMapPath, pathToSkin, isGlProfileActive);
     }

@@ -28,6 +28,10 @@ public class Game {
         inGameActions.clear();
     }
 
+    public GameGraph getGameGraph() {
+        return gameGraph;
+    }
+
     public void addGameAction(GameAction gameAction) {
         inGameActions.add(gameAction);
     }

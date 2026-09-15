@@ -1,5 +1,6 @@
 package com.github.br.libgdx.jam38.game.model.vertex;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.model.GameVertexState;
 import com.github.br.libgdx.jam38.game.model.VertexDelta;
@@ -93,6 +94,11 @@ public class CalculateVertexProxy implements GameVertex {
     @Override
     public void changeEnergy(float diff) {
         target.changeEnergy(diff);
+    }
+
+    @Override
+    public Vector2 getPosition() {
+        return target.getPosition();
     }
 
 }

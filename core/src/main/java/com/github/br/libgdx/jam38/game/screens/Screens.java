@@ -12,4 +12,6 @@ public interface Screens {
         Resources.SKIN, Resources.Tiled.GAME, true
     ), new GameAssetLoader());
 
+    GameScreenState TEMP = new GameScreenState(new TempScreen(), new TempAssetLoader());
+
 }

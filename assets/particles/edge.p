@@ -58,10 +58,10 @@ scaling0: 1.0
 timelineCount: 1
 timeline0: 0.0
 - X Scale - 
-lowMin: 20.0
-lowMax: 20.0
-highMin: 20.0
-highMax: 20.0
+lowMin: 15.0
+lowMax: 15.0
+highMin: 15.0
+highMax: 15.0
 relative: true
 scalingCount: 2
 scaling0: 0.4915275
@@ -75,8 +75,8 @@ active: false
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 70.0
-highMax: 70.0
+highMin: 200.0
+highMax: 200.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -86,24 +86,24 @@ timeline0: 0.0
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 360.0
-highMax: 360.0
-relative: true
+highMin: 0.0
+highMax: 0.0
+relative: false
 scalingCount: 2
 scaling0: 1.0
-scaling1: 0.0
+scaling1: 1.0
 timelineCount: 2
 timeline0: 0.0
-timeline1: 0.9444449
+timeline1: 1.0
 - Rotation - 
 active: true
 lowMin: 0.0
-lowMax: 360.0
-highMin: -100.0
-highMax: 100.0
-relative: true
+lowMax: 0.0
+highMin: 0.0
+highMax: 0.0
+relative: false
 scalingCount: 2
-scaling0: 0.0
+scaling0: 1.0
 scaling1: 1.0
 timelineCount: 2
 timeline0: 0.0
@@ -124,16 +124,12 @@ timeline1: 0.9791671
 - Gravity - 
 active: false
 - Tint - 
-colorsCount: 6
+colorsCount: 3
 colors0: 0.42745098
 colors1: 0.3137255
 colors2: 0.80784315
-colors3: 0.7607843
-colors4: 0.80784315
-colors5: 0.3137255
-timelineCount: 2
+timelineCount: 1
 timeline0: 0.0
-timeline1: 0.62920046
 - Transparency - 
 lowMin: 0.0
 lowMax: 0.0
