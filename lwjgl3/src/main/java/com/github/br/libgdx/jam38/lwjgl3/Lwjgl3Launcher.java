@@ -4,7 +4,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.github.br.libgdx.jam38.Main;
 
-/** Launches the desktop (LWJGL3) application. */
+/**
+ * Launches the desktop (LWJGL3) application.
+ */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
@@ -40,6 +42,10 @@ public class Lwjgl3Launcher {
         //// are not intended for games that use GL30 (which is compatibility with OpenGL ES 3.0).
         configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0);
 
+        // для tinyVG
+        configuration.setBackBufferConfig(8, 8, 8, 8, 16, 2, 0);
+
         return configuration;
     }
+
 }

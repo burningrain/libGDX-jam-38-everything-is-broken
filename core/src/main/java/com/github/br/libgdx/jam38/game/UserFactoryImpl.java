@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam38;
+package com.github.br.libgdx.jam38.game;
 
 
 import com.github.br.libgdx.jam38.structure.GameManager;
