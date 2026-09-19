@@ -12,7 +12,7 @@ public class FreezeVertexAction extends GameVertexAction {
 
     @Override
     public void execute(GameVertex gameVertex) {
-        gameVertex.setState(GameVertexState.FREEZE);
+        gameVertex.setFreeze(true);
     }
 
     @Override

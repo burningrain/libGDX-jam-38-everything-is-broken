@@ -12,6 +12,7 @@ public class CalculateVertexProxy implements GameVertex {
 
     private float outEnergy = 0f;
     private float inEnergy = 0f;
+    private float diffEnergy = 0f;
     private Array<AddedEnergy> outEnergyArray = null;
 
     public CalculateVertexProxy(GameVertexData target) {
@@ -40,10 +41,10 @@ public class CalculateVertexProxy implements GameVertex {
 
     @Override
     public VertexDelta calculateFinal() {
-        float diff = inEnergy - outEnergy;
-        target.changeEnergy(diff);
+        diffEnergy = inEnergy - outEnergy;
+        target.changeEnergy(diffEnergy);
 
-        VertexDelta vertexDelta = new VertexDelta(target, diff, inEnergy, outEnergy, outEnergyArray);
+        VertexDelta vertexDelta = new VertexDelta(target, diffEnergy, inEnergy, outEnergy, outEnergyArray);
         inEnergy = 0f;
         outEnergy = 0f;
         outEnergyArray = null;
@@ -99,6 +100,21 @@ public class CalculateVertexProxy implements GameVertex {
     @Override
     public Vector2 getPosition() {
         return target.getPosition();
+    }
+
+    @Override
+    public float getDiffEnergy() {
+        return diffEnergy;
+    }
+
+    @Override
+    public boolean isFreeze() {
+        return target.isFreeze();
+    }
+
+    @Override
+    public void setFreeze(boolean isFreeze) {
+        target.setFreeze(isFreeze);
     }
 
 }

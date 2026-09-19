@@ -12,13 +12,22 @@ public class GameVertexData {
     private GameVertexState state;
     private float energy;
     private float emissionPercent;
+    private boolean isFreeze;
 
-    public GameVertexData(String name, Vector2 position, float energy, float emissionPercent, GameVertexState state) {
+    public GameVertexData(
+        String name,
+        Vector2 position,
+        float energy,
+        float emissionPercent,
+        GameVertexState state,
+        boolean isFreeze
+    ) {
         this.name = name;
         this.position = position;
         this.state = state;
         this.energy = energy;
         this.emissionPercent = emissionPercent;
+        this.isFreeze = isFreeze;
     }
 
     public String getName() {
@@ -57,4 +66,11 @@ public class GameVertexData {
         this.emissionPercent = emissionPercent;
     }
 
+    public boolean isFreeze() {
+        return isFreeze;
+    }
+
+    public void setFreeze(boolean freeze) {
+        isFreeze = freeze;
+    }
 }

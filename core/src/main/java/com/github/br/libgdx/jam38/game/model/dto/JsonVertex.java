@@ -11,6 +11,7 @@ public class JsonVertex {
     private int energy;
     private float emissionPercent;
     private GameVertexState state;
+    private boolean isFreeze;
 
     public String getName() {
         return name;
@@ -58,6 +59,14 @@ public class JsonVertex {
 
     public void setEmissionPercent(float emissionPercent) {
         this.emissionPercent = emissionPercent;
+    }
+
+    public boolean isFreeze() {
+        return isFreeze;
+    }
+
+    public void setFreeze(boolean freeze) {
+        isFreeze = freeze;
     }
 
 }

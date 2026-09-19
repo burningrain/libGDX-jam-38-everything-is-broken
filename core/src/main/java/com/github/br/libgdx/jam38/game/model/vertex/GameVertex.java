@@ -41,4 +41,10 @@ public interface GameVertex {
 
     Vector2 getPosition();
 
+    float getDiffEnergy();
+
+    boolean isFreeze();
+
+    void setFreeze(boolean isFreeze);
+
 }

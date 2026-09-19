@@ -58,7 +58,8 @@ public class GameGraphLoader {
             new Vector2(vertex.getX(), vertex.getY()),
             vertex.getEnergy(),
             vertex.getEmissionPercent(),
-            state
+            state,
+            vertex.isFreeze()
         );
     }
 

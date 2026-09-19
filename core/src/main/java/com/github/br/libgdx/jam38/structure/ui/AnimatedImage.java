@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class AnimatedImage extends Image {
 
-    private AnimatedDrawable animatedDrawable;
+    private final AnimatedDrawable animatedDrawable;
 
     public AnimatedImage(Animation<TextureRegion> animation) {
         super(new AnimatedDrawable(animation));
@@ -26,7 +26,7 @@ public class AnimatedImage extends Image {
         animatedDrawable.pause();
     }
 
-    public void reset() {
+    public void resetAndPause() {
         animatedDrawable.resetAndPause();
     }
 
@@ -34,8 +34,48 @@ public class AnimatedImage extends Image {
         animatedDrawable.setFrameAndPause(frame);
     }
 
+    public void setLastFrameAndPause() {
+        animatedDrawable.setLastKeyFrameAndPause();
+    }
+
     public boolean isAnimationEnd() {
         return animatedDrawable.isAnimationEnd();
+    }
+
+    public boolean isPaused() {
+        return animatedDrawable.isPaused();
+    }
+
+    public void setLastKeyFrameAndPause() {
+        animatedDrawable.setLastKeyFrameAndPause();
+    }
+
+    public void setPlayMode(Animation.PlayMode playMode) {
+        animatedDrawable.setPlayMode(playMode);
+    }
+
+    public void setFrameDuration(float frameDuration) {
+        animatedDrawable.setFrameDuration(frameDuration);
+    }
+
+    public Animation.PlayMode getPlayMode() {
+        return animatedDrawable.getPlayMode();
+    }
+
+    public float getFrameDuration() {
+        return animatedDrawable.getFrameDuration();
+    }
+
+    public float getAnimationDuration() {
+        return animatedDrawable.getAnimationDuration();
+    }
+
+    public boolean isLooping() {
+        return animatedDrawable.isLooping();
+    }
+
+    public void setLooping(boolean isLooping) {
+        animatedDrawable.setLooping(isLooping);
     }
 
 }

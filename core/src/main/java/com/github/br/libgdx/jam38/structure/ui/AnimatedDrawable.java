@@ -14,6 +14,8 @@ public class AnimatedDrawable extends TextureRegionDrawable {
     private float stateTime = 0;
     private boolean isPaused = false;
 
+    private boolean isLooping;
+
     public AnimatedDrawable(Animation<TextureRegion> animation) {
         this.animation = animation;
         TextureRegion key = animation.getKeyFrame(0);
@@ -32,7 +34,7 @@ public class AnimatedDrawable extends TextureRegionDrawable {
             stateTime += Gdx.graphics.getDeltaTime();
         }
 
-        keyFrame = animation.getKeyFrame(stateTime, false);
+        keyFrame = animation.getKeyFrame(stateTime, isLooping);
         setRegion(keyFrame);
 
         super.draw(batch, x, y, width, height);
@@ -47,7 +49,7 @@ public class AnimatedDrawable extends TextureRegionDrawable {
             stateTime += Gdx.graphics.getDeltaTime();
         }
 
-        keyFrame = animation.getKeyFrame(stateTime, true);
+        keyFrame = animation.getKeyFrame(stateTime, isLooping);
         setRegion(keyFrame);
 
         super.draw(batch, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
@@ -77,4 +79,42 @@ public class AnimatedDrawable extends TextureRegionDrawable {
         stateTime = frameIndex * animation.getFrameDuration();
         pause();
     }
+
+    public void setLastKeyFrameAndPause() {
+        int lastIndex = animation.getKeyFrames().length - 1;
+        setFrameAndPause(lastIndex);
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public void setPlayMode(Animation.PlayMode playMode) {
+        animation.setPlayMode(playMode);
+    }
+
+    public void setFrameDuration(float frameDuration) {
+        animation.setFrameDuration(frameDuration);
+    }
+
+    public Animation.PlayMode getPlayMode() {
+        return animation.getPlayMode();
+    }
+
+    public float getFrameDuration() {
+        return animation.getFrameDuration();
+    }
+
+    public float getAnimationDuration() {
+        return animation.getAnimationDuration();
+    }
+
+    public boolean isLooping() {
+        return isLooping;
+    }
+
+    public void setLooping(boolean isLooping) {
+        this.isLooping = isLooping;
+    }
+
 }

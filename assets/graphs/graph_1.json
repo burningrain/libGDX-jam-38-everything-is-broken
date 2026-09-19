@@ -2,55 +2,59 @@
   "timeSeconds": "41",
   "vertices": [
     {
-      "name": "a",
+      "name": "sphere_creation",
       "x": "200",
       "y": "1000",
       "energy": "50",
       "emissionPercent": "0.05",
-      "state": "NONE"
+      "state": "NONE",
+      "isFreeze": false
     },
     {
-      "name": "b",
+      "name": "sphere_family",
       "x": "600",
       "y": "540",
       "energy": "50",
       "emissionPercent": "0.05",
-      "state": "NONE"
+      "state": "EMITTER",
+      "isFreeze": false
     },
     {
-      "name": "c",
+      "name": "sphere_frendship",
       "x": "1000",
       "y": "540",
       "energy": "50",
       "emissionPercent": "0.05",
-      "state": "NONE"
+      "state": "NONE",
+      "isFreeze": true
     },
     {
-      "name": "d",
+      "name": "sphere_glory",
       "x": "1400",
       "y": "1000",
       "energy": "50",
       "emissionPercent": "0.05",
-      "state": "NONE"
+      "state": "TARGET",
+      "isFreeze": false
     }
   ],
   "edges": [
     {
-      "from": "a",
-      "to": "b"
+      "from": "sphere_creation",
+      "to": "sphere_family"
     },
     {
-      "from": "b",
-      "to": "c"
+      "from": "sphere_family",
+      "to": "sphere_frendship"
     },
     {
-      "from": "c",
-      "to": "d"
+      "from": "sphere_frendship",
+      "to": "sphere_glory"
     }
   ],
   "targets": [
     {
-      "name": "d",
+      "name": "sphere_glory",
       "energy": "50"
     }
   ]
