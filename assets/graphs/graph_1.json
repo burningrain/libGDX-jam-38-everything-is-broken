@@ -5,7 +5,7 @@
       "name": "sphere_creation",
       "x": "200",
       "y": "1000",
-      "energy": "50",
+      "energy": "1",
       "emissionPercent": "0.05",
       "state": "NONE",
       "isFreeze": false
@@ -14,7 +14,7 @@
       "name": "sphere_family",
       "x": "600",
       "y": "540",
-      "energy": "50",
+      "energy": "99",
       "emissionPercent": "0.05",
       "state": "EMITTER",
       "isFreeze": false
@@ -32,7 +32,7 @@
       "name": "sphere_glory",
       "x": "1400",
       "y": "1000",
-      "energy": "50",
+      "energy": "5",
       "emissionPercent": "0.05",
       "state": "TARGET",
       "isFreeze": false

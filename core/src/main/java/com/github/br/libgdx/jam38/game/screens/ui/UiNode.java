@@ -1,8 +1,11 @@
 package com.github.br.libgdx.jam38.game.screens.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TransformDrawable;
@@ -11,6 +14,17 @@ import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.structure.ui.AnimatedImage;
 
 public class UiNode extends Image {
+
+    // Настройки ободка
+
+
+    private static final Color freezeColor = new Color(180/255f, 226/255f, 255/255f, 1f); // rgb(180 226 255)
+    private static final Color emitterColor = new Color(159/255f, 207/255f, 143/255f, 1f); // rgb(159 207 143)
+    private static final Color targetColor = new Color(155/255f, 155/255f, 155/255f, 1f); // rgb(155 155 155)
+    private static final Color emptyColor = new Color(135/255f, 60/255f, 148/255f, 1f); // rgb(135 60 148)
+
+    private float ringRadius = 45f;      // Внешний радиус ободка
+    private float ringThickness = 6f;    // Толщина линии ободка
 
     public enum FreezeAnimState {
         TO_FREEZE, TO_UNFREEZE, FREEZE, UNFREEZE
@@ -83,6 +97,67 @@ public class UiNode extends Image {
         return gameVertex;
     }
 
+    // здесь должен быть https://libgdx.com/news/2021/05/shape-drawer
+    public void drawEnergy(ShapeRenderer shapeRenderer, float parentAlpha) {
+        ringRadius = getWidth() * (1 / 2f + 1 / 16f);
+
+        float energy = gameVertex.getEnergy();
+        if (energy <= 0) {
+            return;
+        }
+
+        shapeRenderer.setColor(getEnergyColor(getModel()));
+
+        float centerX = getX() + getOriginX();
+        float centerY = getY() + getOriginY();
+
+        float rOut = ringRadius * getScaleX();
+        float rIn = (ringRadius - ringThickness) * getScaleX();
+
+        // Переводим проценты в радианы и учитываем стартовую точку на 12 часов (90 градусов)
+        float startAngleRad = (90f + getRotation()) * MathUtils.degreesToRadians;
+        float energyPercentage = energy / 100f;
+
+        // Количество сегментов круга для плавности
+        int segments = 50;
+
+        float lastXOut = centerX + rOut * MathUtils.cos(startAngleRad);
+        float lastYOut = centerY + rOut * MathUtils.sin(startAngleRad);
+        float lastXIn = centerX + rIn * MathUtils.cos(startAngleRad);
+        float lastYIn = centerY + rIn * MathUtils.sin(startAngleRad);
+
+        for (int i = 1; i <= segments; i++) {
+            float percentOfArc = (float) i / segments;
+            // Минус перед углом дает движение ПО часовой стрелке
+            float currentAngleRad = startAngleRad - (energyPercentage * 360f * percentOfArc) * MathUtils.degreesToRadians;
+
+            float nextXOut = centerX + rOut * MathUtils.cos(currentAngleRad);
+            float nextYOut = centerY + rOut * MathUtils.sin(currentAngleRad);
+            float nextXIn = centerX + rIn * MathUtils.cos(currentAngleRad);
+            float nextYIn = centerY + rIn * MathUtils.sin(currentAngleRad);
+
+            // Рисуем один кусочек (квадрат из двух треугольников) нашего ободка
+            shapeRenderer.triangle(lastXOut, lastYOut, nextXOut, nextYOut, nextXIn, nextYIn);
+            shapeRenderer.triangle(lastXIn, lastYIn, nextXIn, nextYIn, lastXOut, lastYOut);
+
+            lastXOut = nextXOut;
+            lastYOut = nextYOut;
+            lastXIn = nextXIn;
+            lastYIn = nextYIn;
+        }
+    }
+
+    private Color getEnergyColor(GameVertex model) {
+        if (model.isFreeze()) {
+            return freezeColor;
+        }
+        return switch (model.getState()) {
+            case EMITTER -> emitterColor;
+            case TARGET -> targetColor;
+            case NONE ->  emptyColor;
+        };
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         float diffEnergy = gameVertex.getDiffEnergy();
@@ -140,7 +215,7 @@ public class UiNode extends Image {
         float originY = getOriginY();
 
         // Настраиваем цвет и альфу родителя для батча
-        com.badlogic.gdx.graphics.Color color = getColor();
+        Color color = getColor();
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
 
         drawChild(batch, nodeImage, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
@@ -195,7 +270,30 @@ public class UiNode extends Image {
 
         // нода выбрана игроком или не выбрана?
         if (isSelected) {
-            drawChild(batch, selectedNode, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
+            float selWidth = selectedNode.getWidth();
+            float selHeight = selectedNode.getHeight();
+
+            // 1. Сдвигаем точку старта (x, y) назад, чтобы центрировать более крупную текстуру
+            float selX = x + (width - selWidth) / 2f;
+            float selY = y + (height - selHeight) / 2f;
+
+            // 2. Рассчитываем НОВЫЙ ориджин ровно по центру selectedNode
+            float selOriginX = selWidth / 2f;
+            float selOriginY = selHeight / 2f;
+
+            drawChild(
+                batch,
+                selectedNode,
+                selX,
+                selY,
+                selOriginX,
+                selOriginY,
+                selWidth,
+                selHeight,
+                scaleX,
+                scaleY,
+                rotation
+            );
         }
 
         float iconX = (width - icon.getRegionWidth()) / 2f;
@@ -264,7 +362,12 @@ public class UiNode extends Image {
     }
 
     public void deselect() {
+        selectedNode.resetAndPause();
         this.isSelected = false;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 
 }

@@ -6,8 +6,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Scaling;
@@ -38,6 +42,7 @@ public class TempScreen extends AbstractGameScreen {
     protected Viewport backgroundViewport;
 
     private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer;
 
     private ObjectMap<String, UiNode> nodesMap = new ObjectMap<>();
     private Array<UiNode> nodes;
@@ -45,7 +50,22 @@ public class TempScreen extends AbstractGameScreen {
 
     private Texture background;
 
+    private float accumulator = 0f;
+    private float stepTime = 1 / 2.5f; // число шагов эмуляции в секунду
+
     private Stage stage;
+    private ClickListener nodeClickListener = new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            Actor target = event.getTarget();
+            UiNode uiNode = (UiNode) target;
+            if (uiNode.isSelected()) {
+                uiNode.deselect();
+            } else {
+                uiNode.select();
+            }
+        }
+    };
 
     @Override
     public void show() {
@@ -76,6 +96,7 @@ public class TempScreen extends AbstractGameScreen {
 
         spriteBatch = new SpriteBatch();
         stage = new Stage(viewport, spriteBatch);
+        shapeRenderer = new ShapeRenderer();
 
         applicationContext = new GameModelApplicationContext();
 
@@ -83,39 +104,23 @@ public class TempScreen extends AbstractGameScreen {
         game.loadGraph("graphs/graph_1.json");
         createGraphUi(game.getGameGraph());
 
-        //Gdx.input.setInputProcessor();
+        Gdx.input.setInputProcessor(stage);
     }
 
-    private void createGraphUi(GameGraph gameGraph) {
-        nodes = new Array<>(gameGraph.getVertices().size);
-        for (GameVertex vertex : gameGraph.getVertices().values()) {
-            UiNode node = uiObjectFactory.createUiNode(vertex);
+    private void handleLogic(float delta) {
+        Game game = applicationContext.getGame();
 
-            Vector2 position = vertex.getPosition();
-            node.setPosition(position.x, position.y);
-            nodes.add(node);
-            nodesMap.put(node.getModel().getName(), node);
+        accumulator += delta;
+        while (accumulator >= stepTime) {
+            accumulator =- stepTime;
+            game.tick(stepTime);
         }
-
-        Array<GameEdge> edges = gameGraph.getEdges();
-        this.edges = new Array<>(edges.size);
-        for (GameEdge edge : edges) {
-            UiEdge uiEdge = uiObjectFactory.createUiEdge(
-                nodesMap.get(edge.getFrom().getName()),
-                nodesMap.get(edge.getTo().getName())
-            );
-            this.edges.add(uiEdge);
-            stage.addActor(uiEdge);
-        }
-
-        for (UiNode node : nodes) {
-            stage.addActor(node);
-        }
-
     }
 
     @Override
     public void render(float delta) {
+        handleLogic(delta);
+
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -135,6 +140,18 @@ public class TempScreen extends AbstractGameScreen {
 
         stage.act();
         stage.draw();
+
+        // отрисовка энергии
+        shapeRenderer.setProjectionMatrix(spriteBatch.getProjectionMatrix());
+        shapeRenderer.setTransformMatrix(spriteBatch.getTransformMatrix());
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (UiNode node : nodes) {
+            node.drawEnergy(shapeRenderer, 1f);
+        }
+        shapeRenderer.end();
     }
 
     @Override
@@ -160,6 +177,35 @@ public class TempScreen extends AbstractGameScreen {
 
     @Override
     public void dispose() {
+
+    }
+
+    private void createGraphUi(GameGraph gameGraph) {
+        nodes = new Array<>(gameGraph.getVertices().size);
+        for (GameVertex vertex : gameGraph.getVertices().values()) {
+            UiNode node = uiObjectFactory.createUiNode(vertex);
+            node.addListener(nodeClickListener);
+
+            Vector2 position = vertex.getPosition();
+            node.setPosition(position.x, position.y);
+            nodes.add(node);
+            nodesMap.put(node.getModel().getName(), node);
+        }
+
+        Array<GameEdge> edges = gameGraph.getEdges();
+        this.edges = new Array<>(edges.size);
+        for (GameEdge edge : edges) {
+            UiEdge uiEdge = uiObjectFactory.createUiEdge(
+                nodesMap.get(edge.getFrom().getName()),
+                nodesMap.get(edge.getTo().getName())
+            );
+            this.edges.add(uiEdge);
+            stage.addActor(uiEdge);
+        }
+
+        for (UiNode node : nodes) {
+            stage.addActor(node);
+        }
 
     }
 }

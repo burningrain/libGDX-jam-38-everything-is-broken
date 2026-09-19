@@ -25,7 +25,7 @@ public class CalculateVertexProxy implements GameVertex {
     @Override
     public void calculateCurrent() {
         if (GameVertexState.EMITTER == target.getState()) {
-            outEnergy = target.getEnergy() * target.getEmissionPercent();
+            outEnergy = Math.max(target.getEnergy() * target.getEmissionPercent(), 2.5f);
             Array<GameVertex> neighbours = getNeighbours();
 
             float sum = 0f;
