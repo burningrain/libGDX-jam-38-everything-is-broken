@@ -79,6 +79,10 @@ public class UiNode extends Image {
         nodeImage.play();
     }
 
+    public GameVertex getModel() {
+        return gameVertex;
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         float diffEnergy = gameVertex.getDiffEnergy();

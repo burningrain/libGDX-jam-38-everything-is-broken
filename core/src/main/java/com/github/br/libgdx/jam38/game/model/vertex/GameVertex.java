@@ -7,6 +7,8 @@ import com.github.br.libgdx.jam38.game.model.VertexDelta;
 
 public interface GameVertex {
 
+    GameVertex USER_ACTION = new GameVertexUser();
+
     class AddedEnergy {
         private final GameVertex neighbour;
         private final float addedEnergy;
@@ -35,7 +37,7 @@ public interface GameVertex {
 
     float getEnergy();
 
-    void addEnergy(float addedEnergy);
+    void addEnergy(GameVertex from, float addedEnergy);
 
     void changeEnergy(float diff);
 
@@ -46,5 +48,10 @@ public interface GameVertex {
     boolean isFreeze();
 
     void setFreeze(boolean isFreeze);
+
+    // --------------------------
+    void addGameVertexListener(GameVertexListener gameVertexListener);
+
+    void removeListener(GameVertexListener gameVertexListener);
 
 }

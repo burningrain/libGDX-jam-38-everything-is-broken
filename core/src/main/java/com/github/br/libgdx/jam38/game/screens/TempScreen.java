@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
@@ -17,6 +18,7 @@ import com.github.br.libgdx.jam38.game.Resources;
 import com.github.br.libgdx.jam38.game.model.Game;
 import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
 import com.github.br.libgdx.jam38.game.model.GameGraph;
+import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.game.screens.ui.UiEdge;
 import com.github.br.libgdx.jam38.game.screens.ui.UiNode;
@@ -37,6 +39,7 @@ public class TempScreen extends AbstractGameScreen {
 
     private SpriteBatch spriteBatch;
 
+    private ObjectMap<String, UiNode> nodesMap = new ObjectMap<>();
     private Array<UiNode> nodes;
     private Array<UiEdge> edges;
 
@@ -84,20 +87,31 @@ public class TempScreen extends AbstractGameScreen {
     }
 
     private void createGraphUi(GameGraph gameGraph) {
-        AssetManager assetManager = getGameManager().assetManager;
-
         nodes = new Array<>(gameGraph.getVertices().size);
         for (GameVertex vertex : gameGraph.getVertices().values()) {
             UiNode node = uiObjectFactory.createUiNode(vertex);
 
             Vector2 position = vertex.getPosition();
             node.setPosition(position.x, position.y);
-
             nodes.add(node);
+            nodesMap.put(node.getModel().getName(), node);
+        }
+
+        Array<GameEdge> edges = gameGraph.getEdges();
+        this.edges = new Array<>(edges.size);
+        for (GameEdge edge : edges) {
+            UiEdge uiEdge = uiObjectFactory.createUiEdge(
+                nodesMap.get(edge.getFrom().getName()),
+                nodesMap.get(edge.getTo().getName())
+            );
+            this.edges.add(uiEdge);
+            stage.addActor(uiEdge);
+        }
+
+        for (UiNode node : nodes) {
             stage.addActor(node);
         }
 
-        edges = new Array<>(gameGraph.getEdges().size);
     }
 
     @Override

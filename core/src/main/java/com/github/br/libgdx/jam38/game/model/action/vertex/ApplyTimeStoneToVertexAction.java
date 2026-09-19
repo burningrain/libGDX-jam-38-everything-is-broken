@@ -14,7 +14,7 @@ public class ApplyTimeStoneToVertexAction extends GameVertexAction {
         if (gameVertex.isFreeze()) {
             gameVertex.setFreeze(false);
         } else {
-            gameVertex.addEnergy(10);
+            gameVertex.addEnergy(GameVertex.USER_ACTION, 10);
         }
     }
 

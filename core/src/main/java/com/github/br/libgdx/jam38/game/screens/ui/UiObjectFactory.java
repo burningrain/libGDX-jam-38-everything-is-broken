@@ -3,7 +3,6 @@ package com.github.br.libgdx.jam38.game.screens.ui;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.Resources;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
@@ -23,19 +22,34 @@ public class UiObjectFactory {
     private final Array<TextureAtlas.AtlasRegion> emitTo;
     private final Array<TextureAtlas.AtlasRegion> emitToFromTime;
 
+    private final Array<TextureAtlas.AtlasRegion> emptyEdge;
+    private final Array<TextureAtlas.AtlasRegion> emitEdge;
+    private final Array<TextureAtlas.AtlasRegion> freezeEdge;
+    private final Array<TextureAtlas.AtlasRegion> targetEdge;
+
+
     public UiObjectFactory(AssetManager assetManager) {
         this.assetManager = assetManager;
 
         textureAtlas = assetManager.get(Resources.GRAPH_GAME_ATLAS, TextureAtlas.class);
+
+        // node
         targetNode = textureAtlas.findRegions(Resources.GraphGame.Node.TARGET_NODE);
         emitterNode = textureAtlas.findRegions(Resources.GraphGame.Node.EMITTER_NODE);
         emptyNode = textureAtlas.findRegions(Resources.GraphGame.Node.EMPTY_NODE);
         freezeNode = textureAtlas.findRegions(Resources.GraphGame.Node.FREEZE_NODE);
         selectedNode = textureAtlas.findRegions(Resources.GraphGame.Node.SELECTED_EFFECT);
 
+        // effects
         emitFrom = textureAtlas.findRegions(Resources.GraphGame.EmitterEffect.EMITTER_FROM);
         emitTo = textureAtlas.findRegions(Resources.GraphGame.EmitterEffect.EMITTER_TO);
         emitToFromTime = textureAtlas.findRegions(Resources.GraphGame.EmitterEffect.EMITTER_FROM_TIME);
+
+        // edge
+        emptyEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.EMPTY_EDGE);
+        emitEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.EMIT_EDGE);
+        freezeEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.FREEZE_EDGE);
+        targetEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.TARGET_EDGE);
     }
 
 
@@ -53,6 +67,18 @@ public class UiObjectFactory {
             createAnimatedImage(emitterNode), // AnimatedImage
             createAnimatedImage(emptyNode), // AnimatedImage
             createAnimatedImage(targetNode) // AnimatedImage
+        );
+    }
+
+    public UiEdge createUiEdge(UiNode from, UiNode to) {
+
+        return new UiEdge(
+            from,
+            to,
+            createAnimatedImage(emitEdge),   // AnimatedImage emitEdge,
+            createAnimatedImage(emptyEdge),  // AnimatedImage emptyEdge,
+            createAnimatedImage(freezeEdge), // AnimatedImage freezeEdge,
+            createAnimatedImage(targetEdge)  // AnimatedImage targetEdge
         );
     }
 
