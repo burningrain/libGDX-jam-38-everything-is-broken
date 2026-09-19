@@ -51,6 +51,8 @@ public class CalculateVertexProxy implements GameVertex {
             for (GameVertexListener gameVertexListener : gameVertexListeners) {
                 gameVertexListener.calculateCurrent(this, inEnergy, outEnergy, outEnergyArray);
             }
+        } else if (target.isFreeze()) {
+            outEnergy = 1;
         }
     }
 

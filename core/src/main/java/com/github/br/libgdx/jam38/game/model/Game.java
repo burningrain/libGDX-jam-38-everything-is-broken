@@ -39,6 +39,7 @@ public class Game {
     public GameDelta tick(float delta) {
         int lastTimeSec = gameTime.getTimerSec();
         boolean isTimeOver = gameTime.isTimeOver();
+        boolean isGameOver = false;
 
         ObjectMap<String, GameVertex> vertices = gameGraph.getVertices();
         boolean isGameVictory = isGameVictory(gameGraph.getTargets(), vertices);
@@ -52,10 +53,11 @@ public class Game {
 
             gameTime.tick(delta); // таймер меняет время
             isTimeOver = gameTime.isTimeOver();
+            isGameOver = isGameOver(gameVertices);
         }
 
         int deltaTime = gameTime.getTimerSec() - lastTimeSec;
-        return new GameDelta(isTimeOver, deltaTime, isGameVictory, vertexDelta, appliedActions);
+        return new GameDelta(isTimeOver, deltaTime, isGameVictory, isGameOver, vertexDelta, appliedActions);
     }
 
     private Array<VertexDelta> calculateGraph(Array<GameVertex> vertices) {
@@ -103,6 +105,15 @@ public class Game {
         }
 
         return true;
+    }
+
+    private boolean isGameOver(Array<GameVertex> targets) {
+        for (GameVertex target : targets) {
+            if (target.getEnergy() <= 0f) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

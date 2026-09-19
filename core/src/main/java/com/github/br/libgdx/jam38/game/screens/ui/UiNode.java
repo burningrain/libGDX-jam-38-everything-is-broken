@@ -16,12 +16,12 @@ import com.github.br.libgdx.jam38.structure.ui.AnimatedImage;
 public class UiNode extends Image {
 
     // Настройки ободка
-
-
+    // https://htmlcolorcodes.com/hex-to-rgb/ - конвертер
     private static final Color freezeColor = new Color(180/255f, 226/255f, 255/255f, 1f); // rgb(180 226 255)
     private static final Color emitterColor = new Color(159/255f, 207/255f, 143/255f, 1f); // rgb(159 207 143)
     private static final Color targetColor = new Color(155/255f, 155/255f, 155/255f, 1f); // rgb(155 155 155)
     private static final Color emptyColor = new Color(135/255f, 60/255f, 148/255f, 1f); // rgb(135 60 148)
+    public static final float MAX_ENERGY = 100f;
 
     private float ringRadius = 45f;      // Внешний радиус ободка
     private float ringThickness = 6f;    // Толщина линии ободка
@@ -116,7 +116,7 @@ public class UiNode extends Image {
 
         // Переводим проценты в радианы и учитываем стартовую точку на 12 часов (90 градусов)
         float startAngleRad = (90f + getRotation()) * MathUtils.degreesToRadians;
-        float energyPercentage = energy / 100f;
+        float energyPercentage = energy / MAX_ENERGY;
 
         // Количество сегментов круга для плавности
         int segments = 50;
@@ -202,6 +202,7 @@ public class UiNode extends Image {
         // текущая нода: целевая, дефолтовая, эмиттер
         AnimatedImage nodeImage = getNodeImage(newState);
 
+        setScaleByEnergy(gameVertex.getEnergy());
         // ОТРИСОВКА
         // Получаем актуальные параметры текущей ноды UiNode
         float x = getX();
@@ -309,6 +310,10 @@ public class UiNode extends Image {
 
         prevState = newState;
         prevIsFreeze = gameVertex.isFreeze();
+    }
+
+    private void setScaleByEnergy(float energy) {
+        setScale(energy / MAX_ENERGY * 0.7f + 0.3f);
     }
 
     private AnimatedImage getNodeImage(GameVertexState newState) {

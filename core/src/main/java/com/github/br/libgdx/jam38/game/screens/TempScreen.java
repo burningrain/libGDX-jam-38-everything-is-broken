@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam38.game.Resources;
 import com.github.br.libgdx.jam38.game.model.Game;
+import com.github.br.libgdx.jam38.game.model.GameDelta;
 import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
 import com.github.br.libgdx.jam38.game.model.GameGraph;
 import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
@@ -67,6 +68,8 @@ public class TempScreen extends AbstractGameScreen {
         }
     };
 
+    private GameDelta lastResult;
+
     @Override
     public void show() {
         AssetManager assetManager = getGameManager().assetManager;
@@ -108,12 +111,17 @@ public class TempScreen extends AbstractGameScreen {
     }
 
     private void handleLogic(float delta) {
+        if (lastResult != null && (lastResult.isGameOver() || lastResult.isTimeOver() || lastResult.isGameVictory())) {
+            System.out.println("КОНЦОВОЧКА");
+            return;
+        }
+
         Game game = applicationContext.getGame();
 
         accumulator += delta;
         while (accumulator >= stepTime) {
             accumulator =- stepTime;
-            game.tick(stepTime);
+            lastResult = game.tick(stepTime);
         }
     }
 
