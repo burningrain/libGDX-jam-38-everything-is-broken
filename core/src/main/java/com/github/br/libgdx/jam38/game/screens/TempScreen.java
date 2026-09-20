@@ -242,6 +242,13 @@ public class TempScreen extends AbstractGameScreen {
                 restartButton.setVisible(true);
             }
             if (lastResult.isGameVictory()) {
+                for (UiNode node : nodes) {
+                    GameVertex model = node.getModel();
+                    if(GameVertexState.TARGET == model.getState()) {
+                        model.setState(GameVertexState.EMITTER);
+                    }
+                }
+
                 nextButton.toFront();
                 nextButton.setVisible(true);
             }
