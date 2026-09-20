@@ -2,7 +2,6 @@ package com.github.br.libgdx.jam38.game.model.action.vertex;
 
 import com.github.br.libgdx.jam38.game.model.action.GameVertexAction;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
-import com.github.br.libgdx.jam38.game.model.GameVertexState;
 
 public class FreezeVertexAction extends GameVertexAction {
 

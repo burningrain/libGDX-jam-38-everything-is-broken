@@ -3,9 +3,15 @@ package com.github.br.libgdx.jam38.game.screens.ui;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.Resources;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiBurnTimeButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmitButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmptyButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiFreezeButton;
 import com.github.br.libgdx.jam38.structure.ui.AnimatedImage;
 
 public class UiObjectFactory {
@@ -13,19 +19,30 @@ public class UiObjectFactory {
     private final AssetManager assetManager;
 
     private final TextureAtlas textureAtlas;
+
+    // node
     private final Array<TextureAtlas.AtlasRegion> targetNode;
     private final Array<TextureAtlas.AtlasRegion> emitterNode;
     private final Array<TextureAtlas.AtlasRegion> emptyNode;
     private final Array<TextureAtlas.AtlasRegion> freezeNode;
     private final Array<TextureAtlas.AtlasRegion> selectedNode;
+
+    // effects
     private final Array<TextureAtlas.AtlasRegion> emitFrom;
     private final Array<TextureAtlas.AtlasRegion> emitTo;
     private final Array<TextureAtlas.AtlasRegion> emitToFromTime;
 
+    // edge
     private final Array<TextureAtlas.AtlasRegion> emptyEdge;
     private final Array<TextureAtlas.AtlasRegion> emitEdge;
     private final Array<TextureAtlas.AtlasRegion> freezeEdge;
     private final Array<TextureAtlas.AtlasRegion> targetEdge;
+
+    // button
+    private final Array<TextureAtlas.AtlasRegion> emptyButtonRegions;
+    private final Array<TextureAtlas.AtlasRegion> emitterButtonRegions;
+    private final Array<TextureAtlas.AtlasRegion> freezeButtonRegions;
+    private final Array<TextureAtlas.AtlasRegion> burnButtonRegions;
 
 
     public UiObjectFactory(AssetManager assetManager) {
@@ -50,8 +67,29 @@ public class UiObjectFactory {
         emitEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.EMIT_EDGE);
         freezeEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.FREEZE_EDGE);
         targetEdge = textureAtlas.findRegions(Resources.GraphGame.Edge.TARGET_EDGE);
+
+        // button
+        emptyButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.EMPTY_BUTTON);
+        emitterButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.EMITTER_BUTTON);
+        freezeButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.FREEZE_BUTTON);
+        burnButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.BURN_BUTTON);
     }
 
+    public UiEmptyButton createEmptyButton() {
+        return new UiEmptyButton(createImageButtonStyle(emptyButtonRegions));
+    }
+
+    public UiEmitButton createEmitButton() {
+        return new UiEmitButton(createImageButtonStyle(emitterButtonRegions));
+    }
+
+    public UiFreezeButton createFreezeButton() {
+        return new UiFreezeButton(createImageButtonStyle(freezeButtonRegions));
+    }
+
+    public UiBurnTimeButton createBurnTimeButton() {
+        return new UiBurnTimeButton(createImageButtonStyle(burnButtonRegions));
+    }
 
     public UiNode createUiNode(GameVertex vertex) {
         TextureAtlas.AtlasRegion icon = textureAtlas.findRegion(vertex.getName());
@@ -88,6 +126,16 @@ public class UiObjectFactory {
         animatedImage.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
 
         return animatedImage;
+    }
+
+    private ImageButton.ImageButtonStyle createImageButtonStyle(Array<TextureAtlas.AtlasRegion> buttonRegions) {
+        ImageButton.ImageButtonStyle myButtonStyle = new ImageButton.ImageButtonStyle();
+        myButtonStyle.up = new TextureRegionDrawable(buttonRegions.get(0));
+        myButtonStyle.down = new TextureRegionDrawable(buttonRegions.get(3));
+        myButtonStyle.over = new TextureRegionDrawable(buttonRegions.get(2));
+        myButtonStyle.disabled = new TextureRegionDrawable(buttonRegions.get(1));
+
+        return myButtonStyle;
     }
 
 

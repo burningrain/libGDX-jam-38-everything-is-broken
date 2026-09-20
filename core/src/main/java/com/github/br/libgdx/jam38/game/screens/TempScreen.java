@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -23,11 +24,19 @@ import com.github.br.libgdx.jam38.game.model.Game;
 import com.github.br.libgdx.jam38.game.model.GameDelta;
 import com.github.br.libgdx.jam38.game.model.GameGraph;
 import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
+import com.github.br.libgdx.jam38.game.model.action.GameVertexAction;
 import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
+import com.github.br.libgdx.jam38.game.model.action.vertex.ApplyTimeStoneToVertexAction;
+import com.github.br.libgdx.jam38.game.model.action.vertex.FreezeVertexAction;
+import com.github.br.libgdx.jam38.game.model.action.vertex.SwitchEmitterVertexAction;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.game.screens.ui.UiEdge;
 import com.github.br.libgdx.jam38.game.screens.ui.UiNode;
 import com.github.br.libgdx.jam38.game.screens.ui.UiObjectFactory;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiBurnTimeButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmitButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmptyButton;
+import com.github.br.libgdx.jam38.game.screens.ui.button.UiFreezeButton;
 import com.github.br.libgdx.jam38.structure.GameSettings;
 import com.github.br.libgdx.jam38.structure.screen.AbstractGameScreen;
 
@@ -55,20 +64,64 @@ public class TempScreen extends AbstractGameScreen {
     private float stepTime = 1 / 2.5f; // число шагов эмуляции в секунду
 
     private Stage stage;
+
+    private UiNode selectedNode = null;
     private final ClickListener nodeClickListener = new ClickListener() {
         @Override
-        public void clicked(InputEvent event, float x, float y) {
+        public void clicked (InputEvent event, float x, float y) {
             Actor target = event.getTarget();
-            UiNode uiNode = (UiNode) target;
-            if (uiNode.isSelected()) {
-                uiNode.deselect();
+            UiNode uiTargetNode = (UiNode) target;
+            String name = uiTargetNode.getModel().getName();
+            if (selectedNode != null && !selectedNode.getModel().getName().equals(name)) {
+                selectedNode.deselect();
+            }
+
+            if (uiTargetNode.isSelected()) {
+                selectedNode = null;
+                uiTargetNode.deselect();
             } else {
-                uiNode.select();
+                selectedNode = uiTargetNode;
+                uiTargetNode.select();
             }
         }
     };
 
     private GameDelta lastResult;
+
+    // buttons
+    private UiEmptyButton emptyButton;
+    private final ChangeListener emptyButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            Game game = applicationContext.getGame();
+            game.addGameAction(new SwitchEmitterVertexAction(selectedNode.getModel().getName()));
+        }
+    };
+
+    private UiEmitButton emitButton;
+    private final ChangeListener emitButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            Game game = applicationContext.getGame();
+            game.addGameAction(new SwitchEmitterVertexAction(selectedNode.getModel().getName()));
+        }
+    };
+    private UiFreezeButton freezeButton;
+    private final ChangeListener freezeButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            Game game = applicationContext.getGame();
+            game.addGameAction(new FreezeVertexAction(selectedNode.getModel().getName()));
+        }
+    };
+    private UiBurnTimeButton burnTimeButton;
+    private final ChangeListener burnTimeButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            Game game = applicationContext.getGame();
+            game.addGameAction(new ApplyTimeStoneToVertexAction(selectedNode.getModel().getName()));
+        }
+    };
 
     @Override
     public void show() {
@@ -102,10 +155,11 @@ public class TempScreen extends AbstractGameScreen {
         shapeRenderer = new ShapeRenderer();
 
         applicationContext = new GameModelApplicationContext();
-
         Game game = applicationContext.getGame();
         game.loadGraph("graphs/graph_1.json");
+
         createGraphUi(game.getGameGraph());
+        createButtons();
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -122,6 +176,41 @@ public class TempScreen extends AbstractGameScreen {
         while (accumulator >= stepTime) {
             accumulator -= stepTime;
             lastResult = game.tick(stepTime);
+        }
+
+        updateButtonsForSelectedNode();
+    }
+
+    private void updateButtonsForSelectedNode() {
+        if (selectedNode == null) {
+            emptyButton.setDisabled(true);
+            emitButton.setDisabled(true);
+            freezeButton.setDisabled(true);
+            burnTimeButton.setDisabled(true);
+            return;
+        }
+
+        GameVertex model = selectedNode.getModel();
+
+        emptyButton.setDisabled(false);
+        emitButton.setDisabled(false);
+        freezeButton.setDisabled(false);
+        burnTimeButton.setDisabled(false);
+
+        if (model.isFreeze()) {
+            freezeButton.setDisabled(true);
+            emptyButton.setDisabled(true);
+            emitButton.setDisabled(true);
+        }
+        switch (model.getState()) {
+            case NONE -> emptyButton.setDisabled(true);
+            case EMITTER -> emitButton.setDisabled(true);
+            case TARGET -> {
+                emptyButton.setDisabled(true);
+                emitButton.setDisabled(true);
+                freezeButton.setDisabled(true);
+                burnTimeButton.setDisabled(true);
+            }
         }
     }
 
@@ -220,6 +309,36 @@ public class TempScreen extends AbstractGameScreen {
         for (UiNode node : nodes) {
             stage.addActor(node);
         }
-
     }
+
+    private void createButtons() {
+        GameSettings gameSettings = getGameManager().gameSettings;
+
+        int virtualScreenHeight = gameSettings.getVirtualScreenHeight();
+        int startPadding = 270;
+        int padding = 280;
+        int startX = 16;
+
+        emptyButton = uiObjectFactory.createEmptyButton();
+        emptyButton.setPosition(startX, virtualScreenHeight - startPadding);
+        emptyButton.addListener(emptyButtonListener);
+
+        emitButton = uiObjectFactory.createEmitButton();
+        emitButton.setPosition(startX, virtualScreenHeight - (startPadding + padding));
+        emitButton.addListener(emitButtonListener);
+
+        freezeButton = uiObjectFactory.createFreezeButton();
+        freezeButton.setPosition(startX, virtualScreenHeight - (startPadding + padding * 2));
+        freezeButton.addListener(freezeButtonListener);
+
+        burnTimeButton = uiObjectFactory.createBurnTimeButton();
+        burnTimeButton.setPosition(startX, virtualScreenHeight - (startPadding + padding * 3));
+        burnTimeButton.addListener(burnTimeButtonListener);
+
+        stage.addActor(emptyButton);
+        stage.addActor(emitButton);
+        stage.addActor(freezeButton);
+        stage.addActor(burnTimeButton);
+    }
+
 }

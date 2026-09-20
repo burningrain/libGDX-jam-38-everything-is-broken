@@ -1,10 +1,10 @@
 {
-  "timeSeconds": "41",
+  "timeSeconds": "471",
   "vertices": [
     {
       "name": "sphere_creation",
-      "x": "200",
-      "y": "1000",
+      "x": "500",
+      "y": "800",
       "energy": "1",
       "emissionPercent": "0.05",
       "state": "NONE",
@@ -12,7 +12,7 @@
     },
     {
       "name": "sphere_family",
-      "x": "600",
+      "x": "700",
       "y": "540",
       "energy": "99",
       "emissionPercent": "0.05",
@@ -31,7 +31,7 @@
     {
       "name": "sphere_glory",
       "x": "1400",
-      "y": "1000",
+      "y": "200",
       "energy": "5",
       "emissionPercent": "0.05",
       "state": "TARGET",
