@@ -45,7 +45,7 @@ public class Game {
         boolean isGameVictory = isGameVictory(gameGraph.getTargets(), vertices);
 
         Array<VertexDelta> vertexDelta = null;
-        Array<GameAction> appliedActions = null;
+        Array<GameAction> appliedActions = new Array<>();
         if (!isTimeOver && !isGameVictory) {
             appliedActions = handleActions(inGameActions, gameGraph, gameTime); // actions могут менять время
             vertexDelta = calculateGraph(gameVertices);
@@ -101,14 +101,13 @@ public class Game {
     }
 
     private boolean isGameVictory(Array<GameVertex> targets, ObjectMap<String, GameVertex> vertices) {
+        boolean result = true;
         for (GameVertex target : targets) {
             GameVertex actual = vertices.get(target.getName());
-            if (target.getEnergy() != actual.getEnergy()) {
-                return false;
-            }
+            result = result & (target.getEnergy() <= actual.getEnergy());
         }
 
-        return true;
+        return result;
     }
 
     private boolean isGameOver(Array<GameVertex> targets) {

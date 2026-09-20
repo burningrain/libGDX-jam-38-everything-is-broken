@@ -55,7 +55,7 @@
   "targets": [
     {
       "name": "sphere_glory",
-      "energy": "50"
+      "energy": "100"
     }
   ]
 }

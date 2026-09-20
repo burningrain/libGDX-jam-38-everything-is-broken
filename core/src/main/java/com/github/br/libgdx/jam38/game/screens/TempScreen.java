@@ -124,13 +124,13 @@ public class TempScreen extends AbstractGameScreen {
         }
     };
 
-    //
     private boolean isGameEnd = false;
+    // кнопки выхода / рестарта уровня
     private ImageButton restartButton;
     private final ChangeListener restartButtonListener = new ChangeListener() {
         @Override
         public void changed(ChangeListener.ChangeEvent event, Actor actor) {
-
+            restartLevel(level);
         }
     };
     private ImageButton nextButton;
@@ -140,6 +140,8 @@ public class TempScreen extends AbstractGameScreen {
 
         }
     };
+
+    private String level;
 
     @Override
     public void show() {
@@ -172,12 +174,60 @@ public class TempScreen extends AbstractGameScreen {
         stage = new Stage(viewport, spriteBatch);
         shapeRenderer = new ShapeRenderer();
 
+        restartLevel("graphs/graph_1.json");
+    }
+
+    public void restartLevel(String level) {
+        setLevel(level);
+        if (edges != null) {
+            for (UiEdge edge : edges) {
+                edge.remove();
+            }
+            edges.clear();
+        }
+        if (nodes != null) {
+            for (UiNode node : nodes) {
+                node.remove();
+            }
+            nodes.clear();
+        }
+        if (nodesMap != null) {
+            nodesMap.clear();
+        }
+
+        if (uiTime != null) {
+            uiTime.remove();
+        }
+        if (emptyButton != null) {
+            emptyButton.remove();
+        }
+        if (emitButton != null) {
+            emitButton.remove();
+        }
+        if (freezeButton != null) {
+            freezeButton.remove();
+        }
+        if (burnTimeButton != null) {
+            burnTimeButton.remove();
+        }
+        isGameEnd = false;
+        lastResult = null;
+        selectedNode = null;
+
+        if (restartButton != null) {
+            restartButton.remove();
+        }
+        if (nextButton != null) {
+            nextButton.remove();
+        }
         createButtons();
+        restartButton.setVisible(false);
+        nextButton.setVisible(false);
 
         applicationContext = new GameModelApplicationContext();
         Game game = applicationContext.getGame();
-        game.loadGraph("graphs/graph_1.json");
-        createTime(game, gameSettings);
+        game.loadGraph(level);
+        createTime(game, getGameManager().gameSettings);
         createGraphUi(game.getGameGraph());
 
         Gdx.input.setInputProcessor(stage);
@@ -425,6 +475,14 @@ public class TempScreen extends AbstractGameScreen {
         uiTime.setScale(0.5f);
         uiTime.setPosition(gameSettings.getVirtualScreenWidth() - 125, 10);
         stage.addActor(uiTime);
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 
 }
