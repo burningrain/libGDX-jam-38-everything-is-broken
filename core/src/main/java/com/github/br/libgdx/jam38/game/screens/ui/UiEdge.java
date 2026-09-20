@@ -25,6 +25,8 @@ public class UiEdge extends Image {
     // Временный вектор для избежания аллокаций памяти в методе draw
     private final Vector2 direction = new Vector2();
 
+    private AnimatedImage prevEdge;
+
     public UiEdge(
         UiNode from,
         UiNode to,
@@ -54,11 +56,16 @@ public class UiEdge extends Image {
         edge.setLooping(true);
         edge.setPlayMode(Animation.PlayMode.LOOP_PINGPONG); // слева-направо
         edge.play();
+
+        prevEdge = edge;
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         AnimatedImage edge = getEdgeType(from, to);
+        if (edge != prevEdge) {
+            edge.play();
+        }
 
         // 1. Динамически рассчитываем трансформацию ребра на основе позиций вершин
         float toX = to.getX() + to.getOriginX();
@@ -93,6 +100,8 @@ public class UiEdge extends Image {
 
         // 3. Отрисовываем активную анимацию ребра с учетом всех трансформаций
         drawChild(batch, edge, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
+
+        prevEdge = edge;
     }
 
     // Помощник для отрисовки вложенных изображений с учетом трансформации родителя (как в UiNode)
