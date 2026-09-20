@@ -17,18 +17,11 @@ public class UiNode extends Image {
 
     // Настройки ободка
     // https://htmlcolorcodes.com/hex-to-rgb/ - конвертер
-    private static final Color freezeColor = new Color(180/255f, 226/255f, 255/255f, 1f); // rgb(180 226 255)
-    private static final Color emitterColor = new Color(159/255f, 207/255f, 143/255f, 1f); // rgb(159 207 143)
-    private static final Color targetColor = new Color(155/255f, 155/255f, 155/255f, 1f); // rgb(155 155 155)
-    private static final Color emptyColor = new Color(135/255f, 60/255f, 148/255f, 1f); // rgb(135 60 148)
+    private static final Color freezeColor = new Color(180 / 255f, 226 / 255f, 255 / 255f, 1f); // rgb(180 226 255)
+    private static final Color emitterColor = new Color(159 / 255f, 207 / 255f, 143 / 255f, 1f); // rgb(159 207 143)
+    private static final Color targetColor = new Color(155 / 255f, 155 / 255f, 155 / 255f, 1f); // rgb(155 155 155)
+    private static final Color emptyColor = new Color(135 / 255f, 60 / 255f, 148 / 255f, 1f); // rgb(135 60 148)
     public static final float MAX_ENERGY = 100f;
-
-    private float ringRadius = 45f;      // Внешний радиус ободка
-    private float ringThickness = 6f;    // Толщина линии ободка
-
-    public enum FreezeAnimState {
-        TO_FREEZE, TO_UNFREEZE, FREEZE, UNFREEZE
-    }
 
     // константы
     private final GameVertex gameVertex; // модель
@@ -44,9 +37,8 @@ public class UiNode extends Image {
     private final TextureAtlas.AtlasRegion icon;
 
     // переменные
-    private GameVertexState prevState;
-    private boolean prevIsFreeze;
-    private FreezeAnimState freezeAnimState = FreezeAnimState.UNFREEZE;
+    private float ringRadius = 45f;      // Внешний радиус ободка
+    private float ringThickness = 6f;    // Толщина линии ободка
 
     private boolean isSelected = false;
 
@@ -77,20 +69,22 @@ public class UiNode extends Image {
         this.emptyNode = emptyNode;
         this.targetNode = targetNode;
 
-        this.prevIsFreeze = false;
-        this.prevState = null;
-
         emitFrom.setFrameAndPause(0);
         emitToFromTime.setFrameAndPause(0);
         emitTo.setFrameAndPause(0);
         selectedNode.setFrameAndPause(0);
         freezeNode.setFrameAndPause(0);
+
         emitterNode.setFrameAndPause(0);
         emptyNode.setFrameAndPause(0);
         targetNode.setFrameAndPause(0);
 
         AnimatedImage nodeImage = getNodeImage(gameVertex.getState());
         nodeImage.play();
+
+        if (gameVertex.isFreeze()) {
+            freeze();
+        }
     }
 
     public GameVertex getModel() {
@@ -154,36 +148,45 @@ public class UiNode extends Image {
         return switch (model.getState()) {
             case EMITTER -> emitterColor;
             case TARGET -> targetColor;
-            case NONE ->  emptyColor;
+            case NONE -> emptyColor;
         };
+    }
+
+    public void freeze() {
+        // заморозка ноды
+        freezeNode.resetAndPause();
+        freezeNode.setLooping(false);
+        freezeNode.setPlayMode(Animation.PlayMode.REVERSED);
+        freezeNode.play();
+    }
+
+    public void unfreeze() {
+        // разморозка ноды
+        freezeNode.resetAndPause();
+        freezeNode.setLooping(false);
+        freezeNode.setPlayMode(Animation.PlayMode.NORMAL);
+        freezeNode.play();
+    }
+
+//    public void emitFrom() {
+//
+//    }
+//
+//    public void emitTo() {
+//
+//    }
+
+    public void emitFromTime() {
+        emitToFromTime.resetAndPause();
+        emitToFromTime.setLooping(false);
+        emitToFromTime.setPlayMode(Animation.PlayMode.NORMAL);
+        emitToFromTime.play();
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         float diffEnergy = gameVertex.getDiffEnergy();
         GameVertexState newState = gameVertex.getState();
-        if (newState != prevState) {
-            // переход целевой ноды в дефолтовую
-            if (!prevIsFreeze && gameVertex.isFreeze()) { // однократное переключение
-                // заморозка ноды
-                freezeNode.resetAndPause();
-                freezeNode.setLooping(false);
-                freezeNode.setPlayMode(Animation.PlayMode.REVERSED);
-                freezeNode.play();
-
-                freezeAnimState = FreezeAnimState.TO_FREEZE;
-            } else if (prevIsFreeze && !gameVertex.isFreeze()) { // однократное переключение
-                // разморозка ноды
-                emitToFromTime.resetAndPause();
-                freezeNode.setLooping(false);
-                emitToFromTime.play();
-
-                freezeNode.setLastKeyFrameAndPause();
-                freezeNode.setPlayMode(Animation.PlayMode.NORMAL);
-                freezeNode.play();
-                freezeAnimState = FreezeAnimState.TO_UNFREEZE;
-            }
-        }
 
         if (diffEnergy < 0) { // многократное переключение
             // была отдача энергии
@@ -201,7 +204,6 @@ public class UiNode extends Image {
 
         // текущая нода: целевая, дефолтовая, эмиттер
         AnimatedImage nodeImage = getNodeImage(newState);
-
         setScaleByEnergy(gameVertex.getEnergy());
         // ОТРИСОВКА
         // Получаем актуальные параметры текущей ноды UiNode
@@ -242,30 +244,23 @@ public class UiNode extends Image {
                 }
             }
         }
+
+        // заморозка вкл/выкл в процессе анимации?
+        if (!freezeNode.isAnimationEnd() && !freezeNode.isPaused()) {
+            // тогда рисуем
+            drawChild(batch, freezeNode, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
+            if (freezeNode.isAnimationEnd()) {
+                freezeNode.pause();
+            }
+        } else if (getModel().isFreeze()) {
+            drawChild(batch, freezeNode, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
+        }
+
         // приход энергии из камня времени при заморозке
         if (!emitToFromTime.isPaused()) {
             drawChild(batch, emitToFromTime, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
             if (emitToFromTime.isAnimationEnd()) {
                 emitToFromTime.resetAndPause();
-            }
-        }
-
-        // заморозка вкл/выкл?
-        if (FreezeAnimState.UNFREEZE != freezeAnimState) {
-            if (FreezeAnimState.FREEZE == freezeAnimState) {
-                drawChild(batch, freezeNode, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
-            }
-            if (!freezeNode.isPaused()) {
-                drawChild(batch, freezeNode, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
-                if (freezeNode.isAnimationEnd()) {
-                    if (FreezeAnimState.TO_FREEZE == freezeAnimState) {
-                        freezeAnimState = FreezeAnimState.FREEZE;
-                        freezeNode.pause();
-                    } else if (FreezeAnimState.TO_UNFREEZE == freezeAnimState) {
-                        freezeAnimState = FreezeAnimState.UNFREEZE;
-                        freezeNode.pause();
-                    }
-                }
             }
         }
 
@@ -307,9 +302,6 @@ public class UiNode extends Image {
             scaleX, scaleY,
             rotation
         );
-
-        prevState = newState;
-        prevIsFreeze = gameVertex.isFreeze();
     }
 
     private void setScaleByEnergy(float energy) {

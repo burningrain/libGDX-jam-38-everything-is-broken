@@ -80,11 +80,6 @@ public class AnimatedDrawable extends TextureRegionDrawable {
         pause();
     }
 
-    public void setLastKeyFrameAndPause() {
-        int lastIndex = animation.getKeyFrames().length - 1;
-        setFrameAndPause(lastIndex);
-    }
-
     public boolean isPaused() {
         return isPaused;
     }

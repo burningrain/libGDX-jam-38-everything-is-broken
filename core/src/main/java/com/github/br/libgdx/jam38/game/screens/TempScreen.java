@@ -24,6 +24,7 @@ import com.github.br.libgdx.jam38.game.model.Game;
 import com.github.br.libgdx.jam38.game.model.GameDelta;
 import com.github.br.libgdx.jam38.game.model.GameGraph;
 import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
+import com.github.br.libgdx.jam38.game.model.action.GameAction;
 import com.github.br.libgdx.jam38.game.model.action.GameVertexAction;
 import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
 import com.github.br.libgdx.jam38.game.model.action.vertex.ApplyTimeStoneToVertexAction;
@@ -68,7 +69,7 @@ public class TempScreen extends AbstractGameScreen {
     private UiNode selectedNode = null;
     private final ClickListener nodeClickListener = new ClickListener() {
         @Override
-        public void clicked (InputEvent event, float x, float y) {
+        public void clicked(InputEvent event, float x, float y) {
             Actor target = event.getTarget();
             UiNode uiTargetNode = (UiNode) target;
             String name = uiTargetNode.getModel().getName();
@@ -176,6 +177,21 @@ public class TempScreen extends AbstractGameScreen {
         while (accumulator >= stepTime) {
             accumulator -= stepTime;
             lastResult = game.tick(stepTime);
+            for (GameAction appliedAction : lastResult.getAppliedActions()) {
+                if (appliedAction instanceof GameVertexAction gameVertexAction) {
+                    UiNode uiNode = nodesMap.get(gameVertexAction.getTargetName());
+                    if (gameVertexAction instanceof FreezeVertexAction) {
+                        uiNode.freeze();
+                    }
+                    if (gameVertexAction instanceof ApplyTimeStoneToVertexAction timeStoneAction) {
+                        if (timeStoneAction.isUnfreeze()) {
+                            uiNode.unfreeze();
+                        } else {
+                            uiNode.emitFromTime();
+                        }
+                    }
+                }
+            }
         }
 
         updateButtonsForSelectedNode();

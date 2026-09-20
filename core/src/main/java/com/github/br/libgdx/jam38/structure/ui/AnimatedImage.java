@@ -34,20 +34,12 @@ public class AnimatedImage extends Image {
         animatedDrawable.setFrameAndPause(frame);
     }
 
-    public void setLastFrameAndPause() {
-        animatedDrawable.setLastKeyFrameAndPause();
-    }
-
     public boolean isAnimationEnd() {
         return animatedDrawable.isAnimationEnd();
     }
 
     public boolean isPaused() {
         return animatedDrawable.isPaused();
-    }
-
-    public void setLastKeyFrameAndPause() {
-        animatedDrawable.setLastKeyFrameAndPause();
     }
 
     public void setPlayMode(Animation.PlayMode playMode) {
