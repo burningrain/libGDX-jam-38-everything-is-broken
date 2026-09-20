@@ -1,5 +1,5 @@
 {
-  "timeSeconds": "471",
+  "timeSeconds": "60",
   "vertices": [
     {
       "name": "sphere_creation",
@@ -16,7 +16,7 @@
       "y": "540",
       "energy": "99",
       "emissionPercent": "0.05",
-      "state": "EMITTER",
+      "state": "NONE",
       "isFreeze": false
     },
     {
@@ -26,7 +26,7 @@
       "energy": "50",
       "emissionPercent": "0.05",
       "state": "NONE",
-      "isFreeze": true
+      "isFreeze": false
     },
     {
       "name": "sphere_glory",

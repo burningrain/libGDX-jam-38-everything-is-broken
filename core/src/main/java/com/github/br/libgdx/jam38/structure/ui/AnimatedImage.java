@@ -70,4 +70,12 @@ public class AnimatedImage extends Image {
         animatedDrawable.setLooping(isLooping);
     }
 
+    public void setStateTime(float stateTime) {
+        animatedDrawable.setStateTime(stateTime);
+    }
+
+    public float getStateTime() {
+        return animatedDrawable.getStateTime();
+    }
+
 }

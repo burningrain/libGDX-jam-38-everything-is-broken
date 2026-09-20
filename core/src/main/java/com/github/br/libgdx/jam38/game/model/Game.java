@@ -60,6 +60,10 @@ public class Game {
         return new GameDelta(isTimeOver, deltaTime, isGameVictory, isGameOver, vertexDelta, appliedActions);
     }
 
+    public GameTime getGameTime() {
+        return gameTime;
+    }
+
     private Array<VertexDelta> calculateGraph(Array<GameVertex> vertices) {
         for (GameVertex vertex : vertices) {
             vertex.calculateCurrent();

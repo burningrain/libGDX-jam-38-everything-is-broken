@@ -112,4 +112,12 @@ public class AnimatedDrawable extends TextureRegionDrawable {
         this.isLooping = isLooping;
     }
 
+    public void setStateTime(float stateTime) {
+        this.stateTime = stateTime;
+    }
+
+    public float getStateTime() {
+        return stateTime;
+    }
+
 }

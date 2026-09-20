@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.Resources;
+import com.github.br.libgdx.jam38.game.model.GameTime;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiBurnTimeButton;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmitButton;
@@ -44,6 +45,9 @@ public class UiObjectFactory {
     private final Array<TextureAtlas.AtlasRegion> freezeButtonRegions;
     private final Array<TextureAtlas.AtlasRegion> burnButtonRegions;
 
+    // time stone
+    private final Array<TextureAtlas.AtlasRegion> timeStone;
+
 
     public UiObjectFactory(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -73,6 +77,13 @@ public class UiObjectFactory {
         emitterButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.EMITTER_BUTTON);
         freezeButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.FREEZE_BUTTON);
         burnButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.BURN_BUTTON);
+
+        // time stone
+        timeStone = textureAtlas.findRegions(Resources.GraphGame.TIME);
+    }
+
+    public UiTime createUiTime(GameTime gameTime) {
+        return new UiTime(gameTime, timeStone);
     }
 
     public UiEmptyButton createEmptyButton() {

@@ -34,6 +34,7 @@ import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.game.screens.ui.UiEdge;
 import com.github.br.libgdx.jam38.game.screens.ui.UiNode;
 import com.github.br.libgdx.jam38.game.screens.ui.UiObjectFactory;
+import com.github.br.libgdx.jam38.game.screens.ui.UiTime;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiBurnTimeButton;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmitButton;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmptyButton;
@@ -55,11 +56,12 @@ public class TempScreen extends AbstractGameScreen {
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
 
+    private Texture background;
+
     private ObjectMap<String, UiNode> nodesMap = new ObjectMap<>();
     private Array<UiNode> nodes;
     private Array<UiEdge> edges;
-
-    private Texture background;
+    private UiTime uiTime;
 
     private float accumulator = 0f;
     private float stepTime = 1 / 2.5f; // число шагов эмуляции в секунду
@@ -161,6 +163,7 @@ public class TempScreen extends AbstractGameScreen {
 
         createGraphUi(game.getGameGraph());
         createButtons();
+        createTime(game, gameSettings);
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -331,8 +334,8 @@ public class TempScreen extends AbstractGameScreen {
         GameSettings gameSettings = getGameManager().gameSettings;
 
         int virtualScreenHeight = gameSettings.getVirtualScreenHeight();
-        int startPadding = 270;
-        int padding = 280;
+        int startPadding = 300;
+        int padding = 260;
         int startX = 16;
 
         emptyButton = uiObjectFactory.createEmptyButton();
@@ -355,6 +358,13 @@ public class TempScreen extends AbstractGameScreen {
         stage.addActor(emitButton);
         stage.addActor(freezeButton);
         stage.addActor(burnTimeButton);
+    }
+
+    private void createTime(Game game, GameSettings gameSettings) {
+        uiTime = uiObjectFactory.createUiTime(game.getGameTime());
+        uiTime.setScale(0.5f);
+        uiTime.setPosition(gameSettings.getVirtualScreenWidth() - 125, 10);
+        stage.addActor(uiTime);
     }
 
 }
