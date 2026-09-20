@@ -21,10 +21,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam38.game.Resources;
-import com.github.br.libgdx.jam38.game.model.Game;
-import com.github.br.libgdx.jam38.game.model.GameDelta;
-import com.github.br.libgdx.jam38.game.model.GameGraph;
-import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
+import com.github.br.libgdx.jam38.game.model.*;
 import com.github.br.libgdx.jam38.game.model.action.GameAction;
 import com.github.br.libgdx.jam38.game.model.action.GameVertexAction;
 import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
@@ -175,14 +172,13 @@ public class TempScreen extends AbstractGameScreen {
         stage = new Stage(viewport, spriteBatch);
         shapeRenderer = new ShapeRenderer();
 
+        createButtons();
+
         applicationContext = new GameModelApplicationContext();
         Game game = applicationContext.getGame();
         game.loadGraph("graphs/graph_1.json");
-
-        createGraphUi(game.getGameGraph());
-        createButtons();
-
         createTime(game, gameSettings);
+        createGraphUi(game.getGameGraph());
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -192,9 +188,13 @@ public class TempScreen extends AbstractGameScreen {
         if (isGameEnd) {
             changeButtonsVisible(false);
             if (lastResult.isGameOver() || lastResult.isTimeOver()) {
+                restartButton.toFront();
                 restartButton.setVisible(true);
             }
-            System.out.println("КОНЦОВОЧКА");
+            if (lastResult.isGameVictory()) {
+                nextButton.toFront();
+                nextButton.setVisible(true);
+            }
             return;
         }
 
@@ -221,7 +221,7 @@ public class TempScreen extends AbstractGameScreen {
             }
         }
 
-        updateButtonsForSelectedNode();
+        updateButtonsForSelectedNode(game.getGameTime());
     }
 
     private void changeButtonsVisible(boolean isVisible) {
@@ -231,7 +231,7 @@ public class TempScreen extends AbstractGameScreen {
         burnTimeButton.setVisible(isVisible);
     }
 
-    private void updateButtonsForSelectedNode() {
+    private void updateButtonsForSelectedNode(GameTime gameTime) {
         if (selectedNode == null) {
             emptyButton.setDisabled(true);
             emitButton.setDisabled(true);
@@ -261,6 +261,10 @@ public class TempScreen extends AbstractGameScreen {
                 freezeButton.setDisabled(true);
                 burnTimeButton.setDisabled(true);
             }
+        }
+        if (gameTime.getTimerSec() - 10 <= 0) {
+            //FIXME хардкод из Action по сжиганию
+            burnTimeButton.setDisabled(true);
         }
     }
 

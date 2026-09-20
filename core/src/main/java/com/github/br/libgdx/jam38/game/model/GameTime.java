@@ -22,7 +22,7 @@ public class GameTime {
     }
 
     public boolean isTimeOver() {
-        return timerSec == 0;
+        return timerSec <= 0;
     }
 
     public void reduceTime(int seconds) {

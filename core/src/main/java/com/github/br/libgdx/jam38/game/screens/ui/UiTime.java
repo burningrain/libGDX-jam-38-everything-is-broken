@@ -47,6 +47,10 @@ public class UiTime extends Image {
 
         float deltaTime = Gdx.graphics.getDeltaTime();
         int currentStoneIndex = getCurrentStoneIndex(currentTime);
+        if (currentStoneIndex < 0) {
+            return;
+        }
+
         AnimatedImage currentStone = timeStones.get(currentStoneIndex);
         currentStone.setStateTime(currentStone.getStateTime() + deltaTime);
 
