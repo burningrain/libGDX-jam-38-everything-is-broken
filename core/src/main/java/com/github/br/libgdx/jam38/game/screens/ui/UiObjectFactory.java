@@ -45,6 +45,9 @@ public class UiObjectFactory {
     private final Array<TextureAtlas.AtlasRegion> freezeButtonRegions;
     private final Array<TextureAtlas.AtlasRegion> burnButtonRegions;
 
+    private final Array<TextureAtlas.AtlasRegion> restartButtonRegions;
+    private final Array<TextureAtlas.AtlasRegion> nextButtonRegions;
+
     // time stone
     private final Array<TextureAtlas.AtlasRegion> timeStone;
 
@@ -78,12 +81,23 @@ public class UiObjectFactory {
         freezeButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.FREEZE_BUTTON);
         burnButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.BURN_BUTTON);
 
+        restartButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.RESTART_BUTTON);
+        nextButtonRegions = textureAtlas.findRegions(Resources.GraphGame.Button.NEXT_BUTTON);
+
         // time stone
         timeStone = textureAtlas.findRegions(Resources.GraphGame.TIME);
     }
 
     public UiTime createUiTime(GameTime gameTime) {
         return new UiTime(gameTime, timeStone);
+    }
+
+    public ImageButton createRestartButton() {
+        return new ImageButton(createImageButtonStyleWithoutDisabled(restartButtonRegions));
+    }
+
+    public ImageButton createNextButton() {
+        return new ImageButton(createImageButtonStyleWithoutDisabled(nextButtonRegions));
     }
 
     public UiEmptyButton createEmptyButton() {
@@ -145,6 +159,16 @@ public class UiObjectFactory {
         myButtonStyle.down = new TextureRegionDrawable(buttonRegions.get(3));
         myButtonStyle.over = new TextureRegionDrawable(buttonRegions.get(2));
         myButtonStyle.disabled = new TextureRegionDrawable(buttonRegions.get(1));
+
+        return myButtonStyle;
+    }
+
+    private ImageButton.ImageButtonStyle createImageButtonStyleWithoutDisabled(Array<TextureAtlas.AtlasRegion> buttonRegions) {
+        ImageButton.ImageButtonStyle myButtonStyle = new ImageButton.ImageButtonStyle();
+        myButtonStyle.up = new TextureRegionDrawable(buttonRegions.get(0));
+        myButtonStyle.down = new TextureRegionDrawable(buttonRegions.get(2));
+        myButtonStyle.over = new TextureRegionDrawable(buttonRegions.get(1));
+        myButtonStyle.disabled = null;
 
         return myButtonStyle;
     }

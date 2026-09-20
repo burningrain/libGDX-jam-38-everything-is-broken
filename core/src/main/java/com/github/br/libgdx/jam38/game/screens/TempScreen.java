@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -126,6 +127,23 @@ public class TempScreen extends AbstractGameScreen {
         }
     };
 
+    //
+    private boolean isGameEnd = false;
+    private ImageButton restartButton;
+    private final ChangeListener restartButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+
+        }
+    };
+    private ImageButton nextButton;
+    private final ChangeListener nextButtonListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+
+        }
+    };
+
     @Override
     public void show() {
         AssetManager assetManager = getGameManager().assetManager;
@@ -163,13 +181,19 @@ public class TempScreen extends AbstractGameScreen {
 
         createGraphUi(game.getGameGraph());
         createButtons();
+
         createTime(game, gameSettings);
 
         Gdx.input.setInputProcessor(stage);
     }
 
     private void handleLogic(float delta) {
-        if (lastResult != null && (lastResult.isGameOver() || lastResult.isTimeOver() || lastResult.isGameVictory())) {
+        isGameEnd = lastResult != null && (lastResult.isGameOver() || lastResult.isTimeOver() || lastResult.isGameVictory());
+        if (isGameEnd) {
+            changeButtonsVisible(false);
+            if (lastResult.isGameOver() || lastResult.isTimeOver()) {
+                restartButton.setVisible(true);
+            }
             System.out.println("КОНЦОВОЧКА");
             return;
         }
@@ -198,6 +222,13 @@ public class TempScreen extends AbstractGameScreen {
         }
 
         updateButtonsForSelectedNode();
+    }
+
+    private void changeButtonsVisible(boolean isVisible) {
+        emptyButton.setVisible(isVisible);
+        emitButton.setVisible(isVisible);
+        freezeButton.setVisible(isVisible);
+        burnTimeButton.setVisible(isVisible);
     }
 
     private void updateButtonsForSelectedNode() {
@@ -264,16 +295,18 @@ public class TempScreen extends AbstractGameScreen {
         stage.draw();
 
         // отрисовка энергии
-        shapeRenderer.setProjectionMatrix(spriteBatch.getProjectionMatrix());
-        shapeRenderer.setTransformMatrix(spriteBatch.getTransformMatrix());
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        if (!isGameEnd) {
+            shapeRenderer.setProjectionMatrix(spriteBatch.getProjectionMatrix());
+            shapeRenderer.setTransformMatrix(spriteBatch.getTransformMatrix());
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (UiNode node : nodes) {
-            node.drawEnergy(shapeRenderer, 1f);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            for (UiNode node : nodes) {
+                node.drawEnergy(shapeRenderer, 1f);
+            }
+            shapeRenderer.end();
         }
-        shapeRenderer.end();
     }
 
     @Override
@@ -358,6 +391,29 @@ public class TempScreen extends AbstractGameScreen {
         stage.addActor(emitButton);
         stage.addActor(freezeButton);
         stage.addActor(burnTimeButton);
+
+        //
+        float centerX = viewport.getWorldWidth() / 2f;
+        float centerY = viewport.getWorldHeight() / 2f;
+
+        restartButton = uiObjectFactory.createRestartButton();
+        restartButton.setPosition(
+            centerX - restartButton.getWidth() / 2f,
+            centerY - restartButton.getHeight() / 2f
+        );
+        restartButton.setVisible(false);
+        restartButton.addListener(restartButtonListener);
+
+        nextButton = uiObjectFactory.createNextButton();
+        nextButton.setPosition(
+            centerX - nextButton.getWidth() / 2f,
+            centerY - nextButton.getHeight() / 2f
+        );
+        nextButton.setVisible(false);
+        nextButton.addListener(nextButtonListener);
+
+        stage.addActor(restartButton);
+        stage.addActor(nextButton);
     }
 
     private void createTime(Game game, GameSettings gameSettings) {

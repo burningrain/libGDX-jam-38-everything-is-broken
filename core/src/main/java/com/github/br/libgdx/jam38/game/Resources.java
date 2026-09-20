@@ -20,6 +20,9 @@ public interface Resources {
             String EMITTER_BUTTON = "emitter_button";
             String EMPTY_BUTTON = "empty_button";
             String FREEZE_BUTTON = "freeze_button";
+
+            String RESTART_BUTTON = "restart_button";
+            String NEXT_BUTTON = "next_button";
         }
 
         interface Node {
