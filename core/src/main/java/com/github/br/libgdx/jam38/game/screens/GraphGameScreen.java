@@ -39,8 +39,9 @@ import com.github.br.libgdx.jam38.game.screens.ui.button.UiEmptyButton;
 import com.github.br.libgdx.jam38.game.screens.ui.button.UiFreezeButton;
 import com.github.br.libgdx.jam38.structure.GameSettings;
 import com.github.br.libgdx.jam38.structure.screen.AbstractGameScreen;
+import com.github.br.libgdx.jam38.structure.screen.statemachine.GameScreenState;
 
-public class TempScreen extends AbstractGameScreen {
+public class GraphGameScreen extends AbstractGameScreen {
 
     private GameModelApplicationContext applicationContext;
     private UiObjectFactory uiObjectFactory;
@@ -137,11 +138,17 @@ public class TempScreen extends AbstractGameScreen {
     private final ChangeListener nextButtonListener = new ChangeListener() {
         @Override
         public void changed(ChangeListener.ChangeEvent event, Actor actor) {
-
+            getGameManager().screenStateManager.changeCurrentState(nextScreen);
         }
     };
 
-    private String level;
+    private final String level;
+    private final GameScreenState nextScreen;
+
+    public GraphGameScreen(String level, GameScreenState nextScreen) {
+        this.level = level;
+        this.nextScreen = nextScreen;
+    }
 
     @Override
     public void show() {
@@ -174,11 +181,10 @@ public class TempScreen extends AbstractGameScreen {
         stage = new Stage(viewport, spriteBatch);
         shapeRenderer = new ShapeRenderer();
 
-        restartLevel("graphs/graph_1.json");
+        restartLevel(level); // "graphs/graph_1.json"
     }
 
     public void restartLevel(String level) {
-        setLevel(level);
         if (edges != null) {
             for (UiEdge edge : edges) {
                 edge.remove();
@@ -482,14 +488,6 @@ public class TempScreen extends AbstractGameScreen {
         uiTime.setScale(0.5f);
         uiTime.setPosition(gameSettings.getVirtualScreenWidth() - 125, 10);
         stage.addActor(uiTime);
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
     }
 
 }

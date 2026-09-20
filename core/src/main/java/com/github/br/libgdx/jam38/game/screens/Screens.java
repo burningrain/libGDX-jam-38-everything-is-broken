@@ -12,6 +12,9 @@ public interface Screens {
         Resources.SKIN, Resources.Tiled.GAME, true
     ), new GameAssetLoader());
 
-    GameScreenState TEMP = new GameScreenState(new TempScreen(), new TempAssetLoader());
+    GameScreenState LEVEL_1 = new GameScreenState(
+        new GraphGameScreen("graphs/graph_1.json", GAME),
+        new GraphGameAssetLoader()
+    );
 
 }

@@ -36,7 +36,7 @@ public class Main extends AbstractSimpleGame<UserFactoryImpl> {
 
     @Override
     protected GameScreenState createStartState() {
-        return Screens.TEMP;
+        return Screens.LEVEL_1;
     }
 
     @Override
