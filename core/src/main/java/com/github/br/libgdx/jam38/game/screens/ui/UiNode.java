@@ -119,7 +119,7 @@ public class UiNode extends Image {
         float energyPercentage = energy / MAX_ENERGY;
 
         // Количество сегментов круга для плавности
-        int segments = 50;
+        int segments = 60;
 
         float lastXOut = centerX + rOut * MathUtils.cos(startAngleRad);
         float lastYOut = centerY + rOut * MathUtils.sin(startAngleRad);

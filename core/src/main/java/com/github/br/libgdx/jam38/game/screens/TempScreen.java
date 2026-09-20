@@ -21,8 +21,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam38.game.Resources;
 import com.github.br.libgdx.jam38.game.model.Game;
 import com.github.br.libgdx.jam38.game.model.GameDelta;
-import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
 import com.github.br.libgdx.jam38.game.model.GameGraph;
+import com.github.br.libgdx.jam38.game.model.GameModelApplicationContext;
 import com.github.br.libgdx.jam38.game.model.action.edge.GameEdge;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
 import com.github.br.libgdx.jam38.game.screens.ui.UiEdge;
@@ -55,7 +55,7 @@ public class TempScreen extends AbstractGameScreen {
     private float stepTime = 1 / 2.5f; // число шагов эмуляции в секунду
 
     private Stage stage;
-    private ClickListener nodeClickListener = new ClickListener() {
+    private final ClickListener nodeClickListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             Actor target = event.getTarget();
@@ -120,7 +120,7 @@ public class TempScreen extends AbstractGameScreen {
 
         accumulator += delta;
         while (accumulator >= stepTime) {
-            accumulator =- stepTime;
+            accumulator -= stepTime;
             lastResult = game.tick(stepTime);
         }
     }
@@ -142,10 +142,16 @@ public class TempScreen extends AbstractGameScreen {
         spriteBatch.end();
 
         // --- Рисуем игру (ноды, ребра, частицы) через ExtendViewport ---
+        GameSettings gameSettings = getGameManager().gameSettings;
+        viewport.apply(false);
+        camera.position.set(
+            gameSettings.getVirtualScreenWidth() / 2f,
+            gameSettings.getVirtualScreenHeight() / 2f,
+            0
+        );
         camera.update();
-        viewport.apply(true);
-        spriteBatch.setProjectionMatrix(camera.combined);
 
+        spriteBatch.setProjectionMatrix(camera.combined);
         stage.act();
         stage.draw();
 
@@ -165,7 +171,7 @@ public class TempScreen extends AbstractGameScreen {
     @Override
     public void resize(int width, int height) {
         backgroundViewport.update(width, height, true);
-        viewport.update(width, height, true);
+        viewport.update(width, height, false);
     }
 
     @Override
