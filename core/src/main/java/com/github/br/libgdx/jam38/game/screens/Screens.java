@@ -12,8 +12,23 @@ public interface Screens {
         Resources.SKIN, Resources.Tiled.GAME, true
     ), new GameAssetLoader());
 
+    GameScreenState END = new GameScreenState(
+        new EndScreen(),
+        new EndScreenGameAssetLoader()
+    );
+
+    GameScreenState LEVEL_3 = new GameScreenState(
+        new GraphGameScreen("graphs/graph_3.json", END),
+        new GraphGameAssetLoader()
+    );
+
+    GameScreenState LEVEL_2 = new GameScreenState(
+        new GraphGameScreen("graphs/graph_2.json", LEVEL_3),
+        new GraphGameAssetLoader()
+    );
+
     GameScreenState LEVEL_1 = new GameScreenState(
-        new GraphGameScreen("graphs/graph_1.json", GAME),
+        new GraphGameScreen("graphs/graph_1.json", LEVEL_2),
         new GraphGameAssetLoader()
     );
 
