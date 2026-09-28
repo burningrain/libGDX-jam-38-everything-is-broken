@@ -1,4 +1,4 @@
-package gdx.tools.texturepacker;
+package com.badlogic.gdx.tools.texturepacker;
 
 import com.badlogic.gdx.tools.texturepacker.MaxRectsPacker;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
