@@ -122,14 +122,14 @@ public class UiObjectFactory {
         return new UiNode(
             vertex,
             icon, // Texture
-            createAnimatedImage(emitFrom), // AnimatedImage
-            createAnimatedImage(emitToFromTime), // AnimatedImage
-            createAnimatedImage(emitTo), // AnimatedImage
-            createAnimatedImage(selectedNode), // AnimatedImage
-            createAnimatedImage(freezeNode), // AnimatedImage
-            createAnimatedImage(emitterNode), // AnimatedImage
-            createAnimatedImage(emptyNode), // AnimatedImage
-            createAnimatedImage(targetNode) // AnimatedImage
+            createAnimatedImagePingPong(emitFrom), // AnimatedImage
+            createAnimatedImagePingPong(emitToFromTime), // AnimatedImage
+            createAnimatedImagePingPong(emitTo), // AnimatedImage
+            createAnimatedImagePingPong(selectedNode), // AnimatedImage
+            createAnimatedImagePingPong(freezeNode), // AnimatedImage
+            createAnimatedImagePingPong(emitterNode), // AnimatedImage
+            createAnimatedImagePingPong(emptyNode), // AnimatedImage
+            createAnimatedImagePingPong(targetNode) // AnimatedImage
         );
     }
 
@@ -138,17 +138,25 @@ public class UiObjectFactory {
         return new UiEdge(
             from,
             to,
-            createAnimatedImage(emitEdge),   // AnimatedImage emitEdge,
-            createAnimatedImage(emptyEdge),  // AnimatedImage emptyEdge,
-            createAnimatedImage(freezeEdge), // AnimatedImage freezeEdge,
-            createAnimatedImage(targetEdge)  // AnimatedImage targetEdge
+            createAnimatedImage(emitEdge, 1 / 20f, Animation.PlayMode.LOOP),   // AnimatedImage emitEdge,
+            createAnimatedImagePingPong(emptyEdge),  // AnimatedImage emptyEdge,
+            createAnimatedImagePingPong(freezeEdge), // AnimatedImage freezeEdge,
+            createAnimatedImagePingPong(targetEdge)  // AnimatedImage targetEdge
         );
     }
 
-    private AnimatedImage createAnimatedImage(Array<TextureAtlas.AtlasRegion> targetNode) {
-        AnimatedImage animatedImage = new AnimatedImage(new Animation<>(1 / 14f, targetNode));
+    private AnimatedImage createAnimatedImagePingPong(Array<TextureAtlas.AtlasRegion> targetNode) {
+        return createAnimatedImage(targetNode, 1 / 14f, Animation.PlayMode.LOOP_PINGPONG);
+    }
+
+    private AnimatedImage createAnimatedImage(
+        Array<TextureAtlas.AtlasRegion> targetNode,
+        float frameDuration,
+        Animation.PlayMode playMode
+    ) {
+        AnimatedImage animatedImage = new AnimatedImage(new Animation<>(frameDuration, targetNode));
         animatedImage.setLooping(true);
-        animatedImage.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        animatedImage.setPlayMode(playMode);
 
         return animatedImage;
     }

@@ -10,13 +10,15 @@ public interface GameVertex {
     GameVertex USER_ACTION = new GameVertexUser();
 
     class AddedEnergy {
-        private final GameVertex neighbour;
-        private final float addedEnergy;
+        public final GameVertex neighbour;
+        public final float addedEnergy;
 
         public AddedEnergy(GameVertex neighbour, float addedEnergy) {
             this.neighbour = neighbour;
             this.addedEnergy = addedEnergy;
         }
+
+
     }
 
     Array<GameVertex> getNeighbours();

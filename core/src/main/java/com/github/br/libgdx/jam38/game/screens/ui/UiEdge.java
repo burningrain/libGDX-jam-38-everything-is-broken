@@ -1,17 +1,16 @@
 package com.github.br.libgdx.jam38.game.screens.ui;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TransformDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.model.GameVertexState;
+import com.github.br.libgdx.jam38.game.model.vertex.CalculateVertexProxy;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
+import com.github.br.libgdx.jam38.game.model.vertex.GameVertexListener;
 import com.github.br.libgdx.jam38.structure.ui.AnimatedImage;
 
-public class UiEdge extends Image {
+public class UiEdge extends WidgetGroup {
 
     // модель
     private final UiNode from;
@@ -22,10 +21,13 @@ public class UiEdge extends Image {
     private final AnimatedImage freezeEdge;
     private final AnimatedImage targetEdge;
 
-    // Временный вектор для избежания аллокаций памяти в методе draw
+    // Временный вектор для избежания аллокаций памяти
     private final Vector2 direction = new Vector2();
 
     private AnimatedImage prevEdge;
+
+    private float fromTo;
+    private float toFrom;
 
     public UiEdge(
         UiNode from,
@@ -35,12 +37,45 @@ public class UiEdge extends Image {
         AnimatedImage freezeEdge,
         AnimatedImage targetEdge
     ) {
-        super(emptyEdge.getDrawable());
-        this.setSize(this.getWidth(), this.getHeight());
-        this.setOrigin(this.getWidth() / 2f, this.getHeight() / 2f);
-
         this.from = from;
         this.to = to;
+
+        this.from.getModel().addGameVertexListener(new EdgeGameVertexListener() {
+            @Override
+            public void calculateCurrent(
+                CalculateVertexProxy calculateVertexProxy,
+                float inEnergy,
+                float outEnergy,
+                Array<GameVertex.AddedEnergy> outEnergyArray
+            ) {
+                for (GameVertex.AddedEnergy addedEnergy : outEnergyArray) {
+                    if (addedEnergy.neighbour == to.getModel()) {
+                        fromTo = addedEnergy.addedEnergy;
+                        return;
+                    }
+                }
+                // если не нашлось соседа, которому отдача идет
+                fromTo = 0f;
+            }
+        });
+        this.to.getModel().addGameVertexListener(new EdgeGameVertexListener() {
+            @Override
+            public void calculateCurrent(
+                CalculateVertexProxy calculateVertexProxy,
+                float inEnergy,
+                float outEnergy,
+                Array<GameVertex.AddedEnergy> outEnergyArray
+            ) {
+                for (GameVertex.AddedEnergy addedEnergy : outEnergyArray) {
+                    if (addedEnergy.neighbour == from.getModel()) {
+                        toFrom = addedEnergy.addedEnergy;
+                        return;
+                    }
+                }
+                // если не нашлось соседа, которому отдача идет
+                toFrom = 0f;
+            }
+        });
 
         this.emitEdge = emitEdge;
         this.emptyEdge = emptyEdge;
@@ -53,83 +88,82 @@ public class UiEdge extends Image {
         targetEdge.setFrameAndPause(0);
 
         AnimatedImage edge = getEdgeType(from, to);
-        edge.setLooping(true);
-        edge.setPlayMode(Animation.PlayMode.LOOP_PINGPONG); // слева-направо
         edge.play();
-
         prevEdge = edge;
+
+        // Добавляем текущее ребро как дочерний элемент группы
+        this.addActor(edge);
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
+    public void act(float delta) {
+        super.act(delta);
+
+        // 1. Проверяем смену типа ребра и анимации
         AnimatedImage edge = getEdgeType(from, to);
         if (edge != prevEdge) {
+            this.clearChildren();
+            this.addActor(edge);
             edge.play();
+            prevEdge = edge;
         }
 
-        // 1. Динамически рассчитываем трансформацию ребра на основе позиций вершин
+        // 2. Расчет геометрии ребра на основе позиций узлов
         float toX = to.getX() + to.getOriginX();
         float toY = to.getY() + to.getOriginY();
         float fromX = from.getX() + from.getOriginX();
         float fromY = from.getY() + from.getOriginY();
+
         direction.set(toX, toY).sub(fromX, fromY);
         float distance = direction.len();
         float angle = direction.angleDeg(); // Угол наклона в градусах
 
-        // Выставляем размеры и позицию самому UiEdge, чтобы Scene2D знал его актуальные границы
-        float edgeHeight = emptyEdge.getHeight() > 0 ? emptyEdge.getHeight() : getHeight();
-        this.setPosition(fromX, fromY - edgeHeight / 2f); // Центрируем по оси Y
+        // Вычисляем высоту ребра
+        float edgeHeight = emptyEdge.getHeight() > 0 ? emptyEdge.getHeight() : 10f;
+
+        // 3. Устанавливаем точку опоры (Origin) ТОЧНО ПО ЦЕНТРУ ребра
+        float originX = distance / 2f;
+        float originY = edgeHeight / 2f;
+        this.setOrigin(originX, originY);
         this.setSize(distance, edgeHeight);
-        this.setOrigin(0, edgeHeight / 2f); // Точка поворота — строго начало ребра (от ноды From)
-        this.setRotation(angle);
 
-        // 2. Получаем параметры трансформации
-        float x = getX();
-        float y = getY();
-        float width = getWidth();
-        float height = getHeight();
-        float scaleX = getScaleX();
-        float scaleY = getScaleY();
-        float rotation = getRotation();
-        float originX = getOriginX();
-        float originY = getOriginY();
+        // 4. Расчет позиции левого нижнего угла (лежит на векторе from, но смещен к центру)
+        // Находим центральную точку между узлами: (fromX + toX) / 2
+        // И вычитаем из нее половину размеров ребра, чтобы скомпенсировать setPosition в Scene2D
+        float centerX = (fromX + toX) / 2f;
+        float centerY = (fromY + toY) / 2f;
 
-        // Настраиваем цвет батча под параметры родителя
-        Color color = getColor();
-        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
+        this.setPosition(centerX - originX, centerY - originY);
 
-        // 3. Отрисовываем активную анимацию ребра с учетом всех трансформаций
-        drawChild(batch, edge, x, y, originX, originY, width, height, scaleX, scaleY, rotation);
-
-        prevEdge = edge;
-    }
-
-    // Помощник для отрисовки вложенных изображений с учетом трансформации родителя (как в UiNode)
-    private void drawChild(
-        Batch batch,
-        AnimatedImage child,
-        float x,
-        float y,
-        float originX,
-        float originY,
-        float w,
-        float h,
-        float scaleX,
-        float scaleY,
-        float rotation
-    ) {
-        Drawable drawable = child.getDrawable();
-        if (drawable == null) return;
-
-        if (scaleX != 1 || scaleY != 1 || rotation != 0) {
-            if (drawable instanceof TransformDrawable) {
-                ((TransformDrawable) drawable).draw(
-                    batch, x, y, originX, originY, w, h, scaleX, scaleY, rotation
-                );
-                return;
+        // 5. Логика разворота в зависимости от состояний
+        GameVertex toModel = to.getModel();
+        GameVertex fromModel = from.getModel();
+        if (emitEdge == edge) {
+            if (GameVertexState.EMITTER == fromModel.getState() && GameVertexState.EMITTER == toModel.getState()) {
+                // оба эмиттеры
+                if ((fromTo - toFrom) < 0) {
+                    angle += 180;
+                }
+            } else if (GameVertexState.EMITTER == fromModel.getState()) {
+                // поворот не нужен
+            } else if (GameVertexState.EMITTER == toModel.getState()) {
+                angle += 180;
             }
         }
-        drawable.draw(batch, x, y, w * scaleX, h * scaleY);
+        this.setRotation(angle);
+
+        // 6. Синхронизируем размеры вложенной анимации с размерами группы
+        edge.setPosition(0, 0);
+        edge.setSize(this.getWidth(), this.getHeight());
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        // Благодаря наследованию от WidgetGroup, метод super.draw() автоматически:
+        // 1. Применит позицию (position), поворот (rotation) и точку опоры (origin) текущего UiEdge к батчу.
+        // 2. Сместит систему координат дочернего AnimatedImage в (0,0) относительно начала ребра.
+        // 3. Корректно применит parentAlpha ко всем вложенным элементам.
+        super.draw(batch, parentAlpha);
     }
 
     private AnimatedImage getEdgeType(UiNode uiFrom, UiNode uiTo) {
@@ -147,5 +181,4 @@ public class UiEdge extends Image {
             return emptyEdge;
         }
     }
-
 }
