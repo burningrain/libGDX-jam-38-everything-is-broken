@@ -9,7 +9,7 @@ public interface GameVertexListener {
 
     void changeEnergy(CalculateVertexProxy calculateVertexProxy, float diff);
 
-    void addEnergy(GameVertex from, CalculateVertexProxy calculateVertexProxy, float addedEnergy);
+    void addEnergy(GameVertex from, GameVertex to, float addedEnergy);
 
     void setState(CalculateVertexProxy calculateVertexProxy, GameVertexState gameVertexState);
 

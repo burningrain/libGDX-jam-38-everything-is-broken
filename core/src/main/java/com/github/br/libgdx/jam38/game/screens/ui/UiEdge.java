@@ -3,11 +3,8 @@ package com.github.br.libgdx.jam38.game.screens.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam38.game.model.GameVertexState;
-import com.github.br.libgdx.jam38.game.model.vertex.CalculateVertexProxy;
 import com.github.br.libgdx.jam38.game.model.vertex.GameVertex;
-import com.github.br.libgdx.jam38.game.model.vertex.GameVertexListener;
 import com.github.br.libgdx.jam38.structure.ui.AnimatedImage;
 
 public class UiEdge extends WidgetGroup {
@@ -26,8 +23,8 @@ public class UiEdge extends WidgetGroup {
 
     private AnimatedImage prevEdge;
 
-    private float fromTo;
-    private float toFrom;
+    private float fromToEnergy;
+    private float toFromEnergy;
 
     public UiEdge(
         UiNode from,
@@ -42,38 +39,18 @@ public class UiEdge extends WidgetGroup {
 
         this.from.getModel().addGameVertexListener(new EdgeGameVertexListener() {
             @Override
-            public void calculateCurrent(
-                CalculateVertexProxy calculateVertexProxy,
-                float inEnergy,
-                float outEnergy,
-                Array<GameVertex.AddedEnergy> outEnergyArray
-            ) {
-                for (GameVertex.AddedEnergy addedEnergy : outEnergyArray) {
-                    if (addedEnergy.neighbour == to.getModel()) {
-                        fromTo = addedEnergy.addedEnergy;
-                        return;
-                    }
+            public void addEnergy(GameVertex from, GameVertex to, float addedEnergy) {
+                if (from == UiEdge.this.from.getModel() && to == UiEdge.this.to.getModel()) {
+                    fromToEnergy = addedEnergy;
                 }
-                // если не нашлось соседа, которому отдача идет
-                fromTo = 0f;
             }
         });
         this.to.getModel().addGameVertexListener(new EdgeGameVertexListener() {
             @Override
-            public void calculateCurrent(
-                CalculateVertexProxy calculateVertexProxy,
-                float inEnergy,
-                float outEnergy,
-                Array<GameVertex.AddedEnergy> outEnergyArray
-            ) {
-                for (GameVertex.AddedEnergy addedEnergy : outEnergyArray) {
-                    if (addedEnergy.neighbour == from.getModel()) {
-                        toFrom = addedEnergy.addedEnergy;
-                        return;
-                    }
+            public void addEnergy(GameVertex from, GameVertex to, float addedEnergy) {
+                if (from == UiEdge.this.to.getModel() && to == UiEdge.this.from.getModel()) {
+                    toFromEnergy = addedEnergy;
                 }
-                // если не нашлось соседа, которому отдача идет
-                toFrom = 0f;
             }
         });
 
@@ -141,13 +118,13 @@ public class UiEdge extends WidgetGroup {
         if (emitEdge == edge) {
             if (GameVertexState.EMITTER == fromModel.getState() && GameVertexState.EMITTER == toModel.getState()) {
                 // оба эмиттеры
-                if ((fromTo - toFrom) < 0) {
+                if ((fromToEnergy - toFromEnergy) < 0) {
                     angle += 180;
                 }
             } else if (GameVertexState.EMITTER == fromModel.getState()) {
-                // поворот не нужен
+                // поворот не нужен, по дефолту из from в to течет энергия
             } else if (GameVertexState.EMITTER == toModel.getState()) {
-                angle += 180;
+                angle += 180; // энергия из to во from
             }
         }
         this.setRotation(angle);
@@ -181,4 +158,5 @@ public class UiEdge extends WidgetGroup {
             return emptyEdge;
         }
     }
+
 }

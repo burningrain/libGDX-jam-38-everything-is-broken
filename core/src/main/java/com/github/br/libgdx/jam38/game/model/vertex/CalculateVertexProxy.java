@@ -16,7 +16,7 @@ public class CalculateVertexProxy implements GameVertex {
     private Array<AddedEnergy> outEnergyArray = null;
 
     // observer
-    private Array<GameVertexListener> gameVertexListeners = new Array<>();
+    private final Array<GameVertexListener> gameVertexListeners = new Array<>();
 
     public CalculateVertexProxy(GameVertexData target) {
         this.target = target;

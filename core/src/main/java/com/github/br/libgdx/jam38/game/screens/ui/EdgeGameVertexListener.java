@@ -18,9 +18,7 @@ public abstract class EdgeGameVertexListener implements GameVertexListener {
     }
 
     @Override
-    public void addEnergy(GameVertex from, CalculateVertexProxy calculateVertexProxy, float addedEnergy) {
-
-    }
+    public abstract void addEnergy(GameVertex from, GameVertex to, float addedEnergy);
 
     @Override
     public void setState(CalculateVertexProxy calculateVertexProxy, GameVertexState gameVertexState) {
@@ -38,5 +36,8 @@ public abstract class EdgeGameVertexListener implements GameVertexListener {
     }
 
     @Override
-    public abstract void calculateCurrent(CalculateVertexProxy calculateVertexProxy, float inEnergy, float outEnergy, Array<GameVertex.AddedEnergy> outEnergyArray);
+    public void calculateCurrent(CalculateVertexProxy calculateVertexProxy, float inEnergy, float outEnergy, Array<GameVertex.AddedEnergy> outEnergyArray) {
+
+    }
+
 }
