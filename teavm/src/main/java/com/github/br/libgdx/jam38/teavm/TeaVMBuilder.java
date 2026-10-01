@@ -43,6 +43,7 @@ public class TeaVMBuilder {
 
         // You can also register any classes or packages that require reflection here:
         // TeaReflectionSupplier.addReflectionClass("com.github.br.libgdx.jam38.reflect");
+        TeaReflectionSupplier.addReflectionClass("com.github.br.libgdx.jam38.game.model.dto");
 
         // JavaScript is the default target type for TeaVM, and it works better during debugging.
         teaBuildConfiguration.targetType = TeaVMTargetType.JAVASCRIPT;
