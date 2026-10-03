@@ -433,6 +433,7 @@ public class GraphGameScreen extends AbstractGameScreen {
     private void createButtons() {
         GameSettings gameSettings = getGameManager().gameSettings;
 
+        int virtualScreenWidth = gameSettings.getVirtualScreenWidth();
         int virtualScreenHeight = gameSettings.getVirtualScreenHeight();
         int startPadding = 300;
         int padding = 260;
@@ -460,8 +461,8 @@ public class GraphGameScreen extends AbstractGameScreen {
         stage.addActor(burnTimeButton);
 
         //
-        float centerX = viewport.getWorldWidth() / 2f;
-        float centerY = viewport.getWorldHeight() / 2f;
+        float centerX = virtualScreenWidth / 2f;
+        float centerY = virtualScreenHeight / 2f;
 
         restartButton = uiObjectFactory.createRestartButton();
         restartButton.setPosition(
